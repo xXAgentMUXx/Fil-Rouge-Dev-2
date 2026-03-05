@@ -1,12 +1,43 @@
 <!DOCTYPE html>
-<html lang="en">
-    
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../web/css/index.css">
-    <title>Y-Plaza</title>
+    <title>Y-Plaza - Accueil</title>
 </head>
 <body>
     <a href="/logout" class="logout">Déconnexion</a>
+    
+    <h1>Bienvenue sur Y-Plaza</h1>
+
+    <h2>Nos Propriétés</h2>
+
+    <form method="GET" action="/properties" class="search-form">
+    <input type="text" name="city" placeholder="Ville">
+
+    <input type="number" name="min_price" placeholder="Prix min">
+    <input type="number" name="max_price" placeholder="Prix max">
+
+    <input type="number" name="min_surface" placeholder="Surface min">
+
+    <button type="submit">Rechercher</button>
+</form>
+
+    <div class="property-list">
+        {{range .}}
+            <div class="property-card">
+                <h3>{{.Title}}</h3>
+                <p>{{.Description}}</p>
+                <p>Ville : {{.City}}</p>
+                <p>Prix : {{.Price}} €</p>
+                <p>Surface : {{.Surface}} m²</p>
+                <a href="/property/{{.ID}}" class="view-property">Voir les détails</a>
+            </div>
+        {{end}}
+    </div>
+
+    <a href="/add-property" class="add-property-btn">Ajouter une Propriété</a>
+
 </body>
+</html>

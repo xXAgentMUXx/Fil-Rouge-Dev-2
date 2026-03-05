@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Liste des propriétés</title>
+</head>
+<body>
+    <h1>Liste des propriétés</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Titre</th>
+                <th>Description</th>
+                <th>Ville</th>
+                <th>Prix</th>
+                <th>Surface</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{range .}}
+                <tr>
+                    <td>{{.Title}}</td>
+                    <td>{{.Description}}</td>
+                    <td>{{.City}}</td>
+                    <td>{{.Price}}</td>
+                    <td>{{.Surface}}</td>
+                </tr>
+            {{end}}
+        </tbody>
+    </table>
+    <a href="/add-property">Ajouter une propriété</a>
+</body>
+</html>

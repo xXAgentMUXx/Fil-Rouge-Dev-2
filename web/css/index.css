@@ -1,0 +1,82 @@
+/* index.css */
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f9;
+}
+
+h1 {
+    text-align: center;
+    color: #333;
+}
+
+h2 {
+    text-align: center;
+    color: #555;
+}
+
+.logout {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    color: red;
+    text-decoration: none;
+}
+
+.logout:hover {
+    text-decoration: underline;
+}
+
+.property-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 20px;
+}
+
+.property-card {
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin: 10px;
+    padding: 20px;
+    width: 250px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.property-card h3 {
+    color: #333;
+}
+
+.property-card p {
+    color: #777;
+}
+
+.view-property {
+    display: block;
+    margin-top: 10px;
+    text-decoration: none;
+    color: #007BFF;
+}
+
+.view-property:hover {
+    text-decoration: underline;
+}
+
+.add-property-btn {
+    display: block;
+    text-align: center;
+    margin-top: 30px;
+    padding: 10px 20px;
+    background-color: #28a745;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+}
+
+.add-property-btn:hover {
+    background-color: #218838;
+}
