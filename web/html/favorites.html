@@ -1,0 +1,23 @@
+<h1>Mes Favoris</h1>
+
+{{range .}}
+
+<div class="property-card">
+
+<h3>{{.Title}}</h3>
+
+<p>{{.City}}</p>
+
+<p>{{.Price}} €</p>
+
+<form action="/favorite/remove" method="POST">
+
+<input type="hidden" name="property_id" value="{{.ID}}">
+
+<button type="submit">❌ Retirer</button>
+
+</form>
+
+</div>
+
+{{end}}

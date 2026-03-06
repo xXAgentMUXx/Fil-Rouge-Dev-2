@@ -17,10 +17,15 @@ func main() {
 		SaleRepo:     saleRepo,
 		PropertyRepo: propertyRepo,
 	}
+	userHandler := &web.UserHandler{}
 	saleHandler := &web.SaleHandler{Service: saleService}
 	paymentRepo := &repositories.PaymentRepository{DB: web.DB}
 	paymentService := &services.PaymentService{Repo: paymentRepo}
 	paymentHandler := &web.PaymentHandler{Service: paymentService}
+
+	favoriteRepo := &repositories.FavoriteRepository{DB: web.DB}
+	favoriteService := &services.FavoriteService{Repo: favoriteRepo}
+	favoriteHandler := &web.FavoriteHandler{Service: favoriteService}
 
 	http.HandleFunc("/", web.RequireAuth(propertyHandler.Mainpage))
 	http.HandleFunc("/properties", web.RequireAuth(propertyHandler.ListProperties))
@@ -34,6 +39,10 @@ func main() {
 	http.HandleFunc("/pay-property", web.RequireAuth(paymentHandler.CreateCheckoutSession))
 	http.HandleFunc("/sold", web.RequireAuth(web.SoldPage))
 	http.HandleFunc("/payment-success", web.RequireAuth(web.PaymentSuccess))
+	http.HandleFunc("/favorite/add", web.RequireAuth(favoriteHandler.AddFavorite))
+	http.HandleFunc("/favorite/remove", web.RequireAuth(favoriteHandler.RemoveFavorite))
+	http.HandleFunc("/favorites", web.RequireAuth(favoriteHandler.FavoritesPage))
+	http.HandleFunc("/profile", web.RequireAuth(userHandler.ProfilePage))
 	http.Handle("/web/", http.StripPrefix("/web/", http.FileServer(http.Dir("web"))))
 	println("Serveur lancé sur http://localhost:8080/")
 	http.ListenAndServe(":8080", nil)

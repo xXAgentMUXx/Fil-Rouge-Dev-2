@@ -8,6 +8,8 @@
 </head>
 <body>
     <a href="/logout" class="logout">Déconnexion</a>
+    <a href="/favorites">⭐ Mes favoris</a>
+    <a href="/profile" class="profile-btn">Mon Profil</a>
 
     <h1>Bienvenue sur Y-Plaza</h1>
 
@@ -49,6 +51,10 @@
             <button type="submit">Vendre</button>
         </form>
     {{end}}
+    <form action="/favorite/add" method="POST">
+    <input type="hidden" name="property_id" value="{{.ID}}">
+    <button type="submit">❤️ Favori</button>
+    </form>
 
 {{end}}
 </div>

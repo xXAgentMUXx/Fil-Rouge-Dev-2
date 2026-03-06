@@ -356,8 +356,6 @@ func (h *SaleHandler) Sell(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Prix invalide", http.StatusBadRequest)
 		return
 	}
-
-	// --- Appel service ---
 	err = h.Service.Sell(propertyID, buyerID, price)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -513,3 +511,4 @@ func PaymentSuccess(w http.ResponseWriter, r *http.Request) {
 	}
 	http.Redirect(w, r, "/properties", http.StatusSeeOther)
 }
+

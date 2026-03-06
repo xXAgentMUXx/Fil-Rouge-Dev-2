@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Profil</title>
+<link rel="stylesheet" href="/web/css/index.css">
+</head>
+
+<body>
+
+<a href="/properties">⬅ Retour aux propriétés</a>
+
+<h1>Mon Profil</h1>
+
+<h2>Informations du compte</h2>
+
+<p><strong>Email :</strong> {{.Email}}</p>
+<p><strong>Rôle :</strong> {{.Role}}</p>
+
+<hr>
+
+<h2>🏠 Propriétés achetées</h2>
+
+{{if .Purchases}}
+<ul>
+{{range .Purchases}}
+<li>{{.}}</li>
+{{end}}
+</ul>
+{{else}}
+<p>Aucune propriété achetée</p>
+{{end}}
+
+<hr>
+
+<h2>💰 Propriétés vendues</h2>
+
+{{if .Sales}}
+<ul>
+{{range .Sales}}
+<li>{{.}}</li>
+{{end}}
+</ul>
+{{else}}
+<p>Aucune propriété vendue</p>
+{{end}}
+
+<hr>
+
+<a href="/favorites">⭐ Voir mes favoris</a>
+
+<br><br>
+
+<a href="/logout">🔄 Modifier le compte</a>
+
+</body>
+</html>
