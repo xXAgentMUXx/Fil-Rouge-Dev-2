@@ -3,6 +3,8 @@ package interfaces
 import (
 	"html/template"
 	"net/http"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 type UserHandler struct{}
@@ -35,8 +37,6 @@ func (h *UserHandler) ProfilePage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// -------- PROPRIETES ACHETEES --------
-
 	rowsBuy, err := DB.Query(`
 		SELECT p.title
 		FROM payments pay
@@ -50,17 +50,13 @@ func (h *UserHandler) ProfilePage(w http.ResponseWriter, r *http.Request) {
 
 	if err == nil {
 		defer rowsBuy.Close()
-
 		for rowsBuy.Next() {
 			var title string
-			err := rowsBuy.Scan(&title)
-			if err == nil {
+			if err := rowsBuy.Scan(&title); err == nil {
 				purchases = append(purchases, title)
 			}
 		}
 	}
-
-	// -------- PROPRIETES VENDUES --------
 
 	rowsSell, err := DB.Query(`
 		SELECT p.title
@@ -75,11 +71,9 @@ func (h *UserHandler) ProfilePage(w http.ResponseWriter, r *http.Request) {
 
 	if err == nil {
 		defer rowsSell.Close()
-
 		for rowsSell.Next() {
 			var title string
-			err := rowsSell.Scan(&title)
-			if err == nil {
+			if err := rowsSell.Scan(&title); err == nil {
 				sales = append(sales, title)
 			}
 		}
@@ -94,4 +88,59 @@ func (h *UserHandler) ProfilePage(w http.ResponseWriter, r *http.Request) {
 
 	tmpl := template.Must(template.ParseFiles("web/html/profile.html"))
 	tmpl.Execute(w, data)
+}
+
+func (h *UserHandler) UpdateAccount(w http.ResponseWriter, r *http.Request) {
+
+	if r.Method != http.MethodPost {
+		http.Redirect(w, r, "/profile", http.StatusSeeOther)
+		return
+	}
+
+	cookie, err := r.Cookie("session")
+	if err != nil {
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
+	}
+
+	newEmail := r.FormValue("email")
+	newPassword := r.FormValue("password")
+
+	hash, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.DefaultCost)
+	if err != nil {
+		http.Error(w, "Erreur hash password", 500)
+		return
+	}
+
+	_, err = DB.Exec(
+		"UPDATE users SET email=$1, password=$2 WHERE email=$3",
+		newEmail,
+		string(hash),
+		cookie.Value,
+	)
+
+	if err != nil {
+		http.Error(w, "Erreur mise à jour compte", 500)
+		return
+	}
+
+	http.SetCookie(w, &http.Cookie{
+		Name:  "session",
+		Value: newEmail,
+		Path:  "/",
+	})
+
+	http.Redirect(w, r, "/profile", http.StatusSeeOther)
+}
+
+func (h *UserHandler) UpdatePage(w http.ResponseWriter, r *http.Request) {
+
+	_, err := r.Cookie("session")
+	if err != nil {
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
+	}
+
+	tmpl := template.Must(template.ParseFiles("web/html/update.html"))
+	tmpl.Execute(w, nil)
 }

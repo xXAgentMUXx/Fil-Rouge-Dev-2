@@ -43,6 +43,8 @@ func main() {
 	http.HandleFunc("/favorite/remove", web.RequireAuth(favoriteHandler.RemoveFavorite))
 	http.HandleFunc("/favorites", web.RequireAuth(favoriteHandler.FavoritesPage))
 	http.HandleFunc("/profile", web.RequireAuth(userHandler.ProfilePage))
+	http.HandleFunc("/update-account", userHandler.UpdateAccount)
+	http.HandleFunc("/update", userHandler.UpdatePage)
 	http.Handle("/web/", http.StripPrefix("/web/", http.FileServer(http.Dir("web"))))
 	println("Serveur lancé sur http://localhost:8080/")
 	http.ListenAndServe(":8080", nil)
