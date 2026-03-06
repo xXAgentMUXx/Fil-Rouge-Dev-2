@@ -363,7 +363,6 @@ func (h *SaleHandler) Sell(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-
 	http.Redirect(w, r, "/properties", http.StatusSeeOther)
 }
 
@@ -372,57 +371,75 @@ type PaymentHandler struct {
 }
 
 func (h *PaymentHandler) CreateCheckoutSession(w http.ResponseWriter, r *http.Request) {
+	propertyID, err := strconv.Atoi(r.FormValue("property_id"))
+	if err != nil {
+		http.Error(w, "ID propriété invalide", http.StatusBadRequest)
+		return
+	}
+	cookie, err := r.Cookie("session")
+	if err != nil {
+		http.Error(w, "Utilisateur non connecté", http.StatusUnauthorized)
+		return
+	}
+	var buyerID int
+	err = DB.QueryRow(
+		"SELECT id FROM users WHERE email=$1",
+		cookie.Value,
+	).Scan(&buyerID)
 
-	propertyID, _ := strconv.Atoi(r.FormValue("property_id"))
-	price, _ := strconv.ParseFloat(r.FormValue("price"), 64)
-	
-			cookie, err := r.Cookie("session")
-		if err != nil {
-			http.Error(w, "Utilisateur non connecté", http.StatusUnauthorized)
-			return
-		}
+	if err != nil {
+		http.Error(w, "Utilisateur introuvable", http.StatusInternalServerError)
+		return
+	}
+	var price float64
+	var isSold bool
 
-		var buyerID int
-		err = DB.QueryRow(
-			"SELECT id FROM users WHERE email=$1",
-			cookie.Value,
-		).Scan(&buyerID)
+	err = DB.QueryRow(
+		"SELECT price, is_sold FROM properties WHERE id=$1",
+		propertyID,
+	).Scan(&price, &isSold)
 
-		if err != nil {
-			http.Error(w, "Utilisateur introuvable", 500)
-			return
-		}
-
-	
+	if err != nil {
+		http.Error(w, "Propriété introuvable", http.StatusInternalServerError)
+		return
+	}
+	if isSold {
+		http.Error(w, "Propriété déjà vendue", http.StatusBadRequest)
+		return
+	}
 	stripe.Key = "sk_test_51T7v2sPVJxAvAHPXWguzBmPqfEqWzQfMmWF3s6s9Bpm2StsMRvD6Xf3SKnCbJEB2LhH3rLtYhPvUny0dS9aw4vUS00TWfSIIRJ"
-
-	fmt.Println("Stripe key:", stripe.Key)
 
 	params := &stripe.CheckoutSessionParams{
 		PaymentMethodTypes: stripe.StringSlice([]string{"card"}),
 		Mode:               stripe.String(string(stripe.CheckoutSessionModePayment)),
-		SuccessURL: stripe.String("http://localhost:8080/payment-success?session_id={CHECKOUT_SESSION_ID}"),
-		CancelURL:          stripe.String("http://localhost:8080/payment-cancel"),
+		SuccessURL: stripe.String(
+			"http://localhost:8080/payment-success?session_id={CHECKOUT_SESSION_ID}",
+		),
+		CancelURL: stripe.String("http://localhost:8080/payment-cancel"),
+
 		LineItems: []*stripe.CheckoutSessionLineItemParams{
 			{
 				Quantity: stripe.Int64(1),
 				PriceData: &stripe.CheckoutSessionLineItemPriceDataParams{
+
 					Currency: stripe.String("eur"),
+
 					ProductData: &stripe.CheckoutSessionLineItemPriceDataProductDataParams{
-						Name: stripe.String("Achat propriété"),
+						Name: stripe.String(
+							fmt.Sprintf("Achat propriété #%d", propertyID),
+						),
 					},
-					UnitAmount: stripe.Int64(int64(price * 100)), 
+					UnitAmount: stripe.Int64(int64(price * 100)),
 				},
 			},
 		},
 	}
-
 	s, err := session.New(params)
 	if err != nil {
-		http.Error(w, err.Error(), 500)
+		log.Println("Erreur création session Stripe:", err)
+		http.Error(w, "Erreur Stripe", http.StatusInternalServerError)
 		return
 	}
-
 	payment := models.Payment{
 		PropertyID:      propertyID,
 		BuyerID:         buyerID,
@@ -430,14 +447,12 @@ func (h *PaymentHandler) CreateCheckoutSession(w http.ResponseWriter, r *http.Re
 		StripeSessionID: s.ID,
 		Status:          "pending",
 	}
-
 	err = h.Service.CreatePayment(payment)
 	if err != nil {
-		fmt.Println("Erreur insertion paiement :", err)
+		log.Println("Erreur insertion paiement :", err)
 		http.Error(w, "Erreur enregistrement paiement", 500)
 		return
 	}
-
 	http.Redirect(w, r, s.URL, http.StatusSeeOther)
 }
 
@@ -455,15 +470,16 @@ func SoldPage(w http.ResponseWriter, r *http.Request) {
 		PropertyID: propertyID,
 		Price:      price,
 	}
-
 	tmpl := template.Must(template.ParseFiles("web/html/sold.html"))
 	tmpl.Execute(w, data)
 }
 func PaymentSuccess(w http.ResponseWriter, r *http.Request) {
-
 	sessionID := r.URL.Query().Get("session_id")
 
-	// retrouver le paiement
+	if sessionID == "" {
+		http.Error(w, "Session Stripe manquante", http.StatusBadRequest)
+		return
+	}
 	var propertyID int
 	err := DB.QueryRow(
 		"SELECT property_id FROM payments WHERE stripe_session_id=$1",
@@ -471,31 +487,29 @@ func PaymentSuccess(w http.ResponseWriter, r *http.Request) {
 	).Scan(&propertyID)
 
 	if err != nil {
+		log.Println("Paiement introuvable:", err)
 		http.Error(w, "Paiement introuvable", 500)
 		return
 	}
-
-	// marquer paiement réussi
 	_, err = DB.Exec(
 		"UPDATE payments SET status='paid' WHERE stripe_session_id=$1",
 		sessionID,
 	)
 
 	if err != nil {
+		log.Println("Erreur update paiement:", err)
 		http.Error(w, "Erreur paiement", 500)
 		return
 	}
-
-	// marquer propriété vendue
 	_, err = DB.Exec(
 		"UPDATE properties SET is_sold=true WHERE id=$1",
 		propertyID,
 	)
 
 	if err != nil {
+		log.Println("Erreur update propriété:", err)
 		http.Error(w, "Erreur propriété", 500)
 		return
 	}
-
 	http.Redirect(w, r, "/properties", http.StatusSeeOther)
 }
