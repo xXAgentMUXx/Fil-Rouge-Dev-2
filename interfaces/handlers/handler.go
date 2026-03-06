@@ -4,18 +4,25 @@ import (
 	"database/sql"
 	"filrouge/interfaces/models"
 	"filrouge/interfaces/services"
+	"fmt"
 	"html/template"
 	"log"
 	"net/http"
 	"strconv"
 
 	_ "github.com/lib/pq"
+
+	"github.com/stripe/stripe-go/v78"
+	"github.com/stripe/stripe-go/v78/checkout/session"
 	"golang.org/x/crypto/bcrypt"
-	
 )
 
 var DB *sql.DB
 
+type PropertyPageData struct {
+	Properties []models.Property
+	UserRole   string
+}
 
 func InitDB() {
 	connStr := "host=localhost port=5432 user=postgres password=postgres dbname=filrouge sslmode=disable"
@@ -34,14 +41,36 @@ func InitDB() {
 }
 
 func (h *PropertyHandler) Mainpage(w http.ResponseWriter, r *http.Request) {
-	properties, err := h.Service.ListProperties() 
+	properties, err := h.Service.ListProperties()
 	if err != nil {
 		http.Error(w, "Erreur lors de la récupération des propriétés", http.StatusInternalServerError)
 		return
 	}
-
+	cookie, err := r.Cookie("session")
+	if err != nil {
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
+	}
+	var role string
+	err = DB.QueryRow(
+		"SELECT role FROM users WHERE email = $1",
+		cookie.Value,
+	).Scan(&role)
+	if err == sql.ErrNoRows {
+	http.Redirect(w, r, "/login", http.StatusSeeOther)
+	return
+	}
+	if err != nil {
+		log.Println("Erreur récupération rôle:", err)
+		http.Error(w, "Erreur serveur", http.StatusInternalServerError)
+		return
+	}
+	data := PropertyPageData{
+		Properties: properties,
+		UserRole:   role,
+	}
 	tmpl := template.Must(template.ParseFiles("web/html/index.html"))
-	tmpl.Execute(w, properties) 
+	tmpl.Execute(w, data)
 }
 
 func GetLogin(w http.ResponseWriter, r *http.Request){
@@ -135,63 +164,91 @@ func RequireAuth(next http.HandlerFunc) http.HandlerFunc {
 	}
 }
 
-func RequireRole(role string, next http.HandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
+func RequireRoles(roles ...string) func(http.HandlerFunc) http.HandlerFunc {
+	return func(next http.HandlerFunc) http.HandlerFunc {
+		return func(w http.ResponseWriter, r *http.Request) {
+			cookie, err := r.Cookie("session")
+			if err != nil {
+				http.Redirect(w, r, "/login", http.StatusSeeOther)
+				return
+			}
 
-		cookie, err := r.Cookie("session")
-		if err != nil {
-			http.Redirect(w, r, "/login", http.StatusSeeOther)
-			return
-		}
+			var role string
+			err = DB.QueryRow(
+				"SELECT role FROM users WHERE email = $1",
+				cookie.Value,
+			).Scan(&role)
+			if err != nil {
+				http.Error(w, "Accès interdit", http.StatusForbidden)
+				return
+			}
 
-		var userRole string
-		err = DB.QueryRow("SELECT role FROM users WHERE email=$1", cookie.Value).Scan(&userRole)
-		if err != nil || userRole != role {
+			for _, allowed := range roles {
+				if role == allowed {
+					next(w, r)
+					return
+				}
+			}
+
 			http.Error(w, "Accès interdit", http.StatusForbidden)
-			return
 		}
-
-		next(w, r)
 	}
 }
-
 type PropertyHandler struct {
 	Service *services.PropertyService
 }
 
 func (h *PropertyHandler) ListProperties(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query()
-
 	filter := models.PropertyFilter{
 		City: query.Get("city"),
 	}
-
 	if v := query.Get("min_price"); v != "" {
 		if f, err := strconv.ParseFloat(v, 64); err == nil {
 			filter.MinPrice = &f
 		}
 	}
-
 	if v := query.Get("max_price"); v != "" {
 		if f, err := strconv.ParseFloat(v, 64); err == nil {
 			filter.MaxPrice = &f
 		}
 	}
-
 	if v := query.Get("min_surface"); v != "" {
 		if i, err := strconv.Atoi(v); err == nil {
 			filter.MinSurface = &i
 		}
 	}
-
 	properties, err := h.Service.Search(filter)
 	if err != nil {
 		http.Error(w, "Erreur serveur", http.StatusInternalServerError)
 		return
 	}
+	cookie, err := r.Cookie("session")
+	if err != nil {
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
+	}
 
+	var role string
+	err = DB.QueryRow(
+		"SELECT role FROM users WHERE email = $1",
+		cookie.Value,
+	).Scan(&role)
+	if err == sql.ErrNoRows {
+	http.Redirect(w, r, "/login", http.StatusSeeOther)
+	return
+	}
+	if err != nil {
+		log.Println("Erreur récupération rôle:", err)
+		http.Error(w, "Erreur serveur", http.StatusInternalServerError)
+		return
+	}
+	data := PropertyPageData{
+		Properties: properties,
+		UserRole:   role,
+	}
 	tmpl := template.Must(template.ParseFiles("web/html/index.html"))
-	tmpl.Execute(w, properties)
+	tmpl.Execute(w, data)
 }
 
 func (h *PropertyHandler) AddProperty(w http.ResponseWriter, r *http.Request) {
@@ -267,3 +324,178 @@ func (h *PropertyHandler) AddProperty(w http.ResponseWriter, r *http.Request) {
     tmpl.Execute(w, agencies)
 }
 
+type SaleHandler struct {
+	Service *services.SaleService
+}
+
+func (h *SaleHandler) Sell(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Méthode non autorisée", http.StatusMethodNotAllowed)
+		return
+	}
+
+	// --- Conversion des IDs ---
+	propertyIDStr := r.FormValue("property_id")
+	buyerIDStr := r.FormValue("buyer_id")
+	priceStr := r.FormValue("sale_price")
+
+	propertyID, err := strconv.Atoi(propertyIDStr)
+	if err != nil {
+		http.Error(w, "ID de propriété invalide", http.StatusBadRequest)
+		return
+	}
+
+	buyerID, err := strconv.Atoi(buyerIDStr)
+	if err != nil {
+		http.Error(w, "ID acheteur invalide", http.StatusBadRequest)
+		return
+	}
+
+	price, err := strconv.ParseFloat(priceStr, 64)
+	if err != nil || price <= 0 {
+		http.Error(w, "Prix invalide", http.StatusBadRequest)
+		return
+	}
+
+	// --- Appel service ---
+	err = h.Service.Sell(propertyID, buyerID, price)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	http.Redirect(w, r, "/properties", http.StatusSeeOther)
+}
+
+type PaymentHandler struct {
+	Service *services.PaymentService
+}
+
+func (h *PaymentHandler) CreateCheckoutSession(w http.ResponseWriter, r *http.Request) {
+
+	propertyID, _ := strconv.Atoi(r.FormValue("property_id"))
+	price, _ := strconv.ParseFloat(r.FormValue("price"), 64)
+	
+			cookie, err := r.Cookie("session")
+		if err != nil {
+			http.Error(w, "Utilisateur non connecté", http.StatusUnauthorized)
+			return
+		}
+
+		var buyerID int
+		err = DB.QueryRow(
+			"SELECT id FROM users WHERE email=$1",
+			cookie.Value,
+		).Scan(&buyerID)
+
+		if err != nil {
+			http.Error(w, "Utilisateur introuvable", 500)
+			return
+		}
+
+	
+	stripe.Key = "sk_test_51T7v2sPVJxAvAHPXWguzBmPqfEqWzQfMmWF3s6s9Bpm2StsMRvD6Xf3SKnCbJEB2LhH3rLtYhPvUny0dS9aw4vUS00TWfSIIRJ"
+
+	fmt.Println("Stripe key:", stripe.Key)
+
+	params := &stripe.CheckoutSessionParams{
+		PaymentMethodTypes: stripe.StringSlice([]string{"card"}),
+		Mode:               stripe.String(string(stripe.CheckoutSessionModePayment)),
+		SuccessURL: stripe.String("http://localhost:8080/payment-success?session_id={CHECKOUT_SESSION_ID}"),
+		CancelURL:          stripe.String("http://localhost:8080/payment-cancel"),
+		LineItems: []*stripe.CheckoutSessionLineItemParams{
+			{
+				Quantity: stripe.Int64(1),
+				PriceData: &stripe.CheckoutSessionLineItemPriceDataParams{
+					Currency: stripe.String("eur"),
+					ProductData: &stripe.CheckoutSessionLineItemPriceDataProductDataParams{
+						Name: stripe.String("Achat propriété"),
+					},
+					UnitAmount: stripe.Int64(int64(price * 100)), 
+				},
+			},
+		},
+	}
+
+	s, err := session.New(params)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+
+	payment := models.Payment{
+		PropertyID:      propertyID,
+		BuyerID:         buyerID,
+		Amount:          price,
+		StripeSessionID: s.ID,
+		Status:          "pending",
+	}
+
+	err = h.Service.CreatePayment(payment)
+	if err != nil {
+		fmt.Println("Erreur insertion paiement :", err)
+		http.Error(w, "Erreur enregistrement paiement", 500)
+		return
+	}
+
+	http.Redirect(w, r, s.URL, http.StatusSeeOther)
+}
+
+type SoldPageData struct {
+	PropertyID string
+	Price      string
+}
+
+func SoldPage(w http.ResponseWriter, r *http.Request) {
+
+	propertyID := r.URL.Query().Get("property_id")
+	price := r.URL.Query().Get("price")
+
+	data := SoldPageData{
+		PropertyID: propertyID,
+		Price:      price,
+	}
+
+	tmpl := template.Must(template.ParseFiles("web/html/sold.html"))
+	tmpl.Execute(w, data)
+}
+func PaymentSuccess(w http.ResponseWriter, r *http.Request) {
+
+	sessionID := r.URL.Query().Get("session_id")
+
+	// retrouver le paiement
+	var propertyID int
+	err := DB.QueryRow(
+		"SELECT property_id FROM payments WHERE stripe_session_id=$1",
+		sessionID,
+	).Scan(&propertyID)
+
+	if err != nil {
+		http.Error(w, "Paiement introuvable", 500)
+		return
+	}
+
+	// marquer paiement réussi
+	_, err = DB.Exec(
+		"UPDATE payments SET status='paid' WHERE stripe_session_id=$1",
+		sessionID,
+	)
+
+	if err != nil {
+		http.Error(w, "Erreur paiement", 500)
+		return
+	}
+
+	// marquer propriété vendue
+	_, err = DB.Exec(
+		"UPDATE properties SET is_sold=true WHERE id=$1",
+		propertyID,
+	)
+
+	if err != nil {
+		http.Error(w, "Erreur propriété", 500)
+		return
+	}
+
+	http.Redirect(w, r, "/properties", http.StatusSeeOther)
+}

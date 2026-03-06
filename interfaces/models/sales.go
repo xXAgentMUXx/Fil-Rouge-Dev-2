@@ -3,9 +3,9 @@ package models
 import "time"
 
 type Sale struct {
-	ID         string
-	PropertyID string
-	BuyerID    string
+	ID         int
+	PropertyID int
+	BuyerID    int
 	SalePrice  float64
 	SoldAt     time.Time
 }

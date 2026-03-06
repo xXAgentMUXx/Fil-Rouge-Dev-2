@@ -8,36 +8,55 @@
 </head>
 <body>
     <a href="/logout" class="logout">Déconnexion</a>
-    
+
     <h1>Bienvenue sur Y-Plaza</h1>
 
     <h2>Nos Propriétés</h2>
 
     <form method="GET" action="/properties" class="search-form">
-    <input type="text" name="city" placeholder="Ville">
-
-    <input type="number" name="min_price" placeholder="Prix min">
-    <input type="number" name="max_price" placeholder="Prix max">
-
-    <input type="number" name="min_surface" placeholder="Surface min">
-
-    <button type="submit">Rechercher</button>
-</form>
+        <input type="text" name="city" placeholder="Ville">
+        <input type="number" name="min_price" placeholder="Prix min">
+        <input type="number" name="max_price" placeholder="Prix max">
+        <input type="number" name="min_surface" placeholder="Surface min">
+        <button type="submit">Rechercher</button>
+    </form>
 
     <div class="property-list">
-        {{range .}}
-            <div class="property-card">
-                <h3>{{.Title}}</h3>
-                <p>{{.Description}}</p>
-                <p>Ville : {{.City}}</p>
-                <p>Prix : {{.Price}} €</p>
-                <p>Surface : {{.Surface}} m²</p>
-                <a href="/property/{{.ID}}" class="view-property">Voir les détails</a>
-            </div>
-        {{end}}
-    </div>
+{{range .Properties}}
+<div class="property-card">
+<h3>{{.Title}}</h3>
+<p>{{.Description}}</p>
+<p>Ville : {{.City}}</p>
+<p>Prix : {{.Price}} €</p>
+<p>Surface : {{.Surface}} m²</p>
+{{if .IsSold}}
+<p class="sold">Propriété achetée</p>
+{{else}}
 
+    {{if eq $.UserRole "client"}}
+        <form action="/pay-property" method="POST">
+            <input type="hidden" name="property_id" value="{{.ID}}">
+            <input type="hidden" name="price" value="{{.Price}}">
+            <button type="submit">Acheter</button>
+        </form>
+    {{end}}
+
+    {{if or (eq $.UserRole "agent") (eq $.UserRole "admin")}}
+        <form method="POST" action="/sell-property">
+            <input type="hidden" name="property_id" value="{{.ID}}">
+            <input type="number" name="buyer_id" placeholder="ID acheteur" required>
+            <input type="number" name="sale_price" placeholder="Prix de vente" required>
+            <button type="submit">Vendre</button>
+        </form>
+    {{end}}
+
+{{end}}
+</div>
+{{end}}
+</div>
+
+    {{if or (eq .UserRole "agent") (eq .UserRole "admin")}}
     <a href="/add-property" class="add-property-btn">Ajouter une Propriété</a>
-
+    {{end}}
 </body>
 </html>

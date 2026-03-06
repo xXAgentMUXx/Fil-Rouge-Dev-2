@@ -20,3 +20,15 @@ func (s *PropertyService) AddProperty(property models.Property) error {
 func (s *PropertyService) Search(filter models.PropertyFilter) ([]models.Property, error) {
 	return s.Repo.FindWithFilters(filter)
 }
+
+type PaymentService struct {
+	Repo *repositories.PaymentRepository
+}
+
+func (s *PaymentService) CreatePayment(payment models.Payment) error {
+	return s.Repo.Create(payment)
+}
+
+func (s *PaymentService) ConfirmPayment(sessionID string) error {
+	return s.Repo.UpdateStatus(sessionID, "paid")
+}

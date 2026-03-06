@@ -11,7 +11,7 @@ type PropertyRepository struct {
 }
 
 func (r *PropertyRepository) GetAll() ([]models.Property, error) {
-	rows, err := r.DB.Query("SELECT id, title, description, city, price, surface, agency_id, created_at FROM properties")
+	rows, err := r.DB.Query("SELECT id, title, description, city, price, surface, agency_id, is_sold, created_at FROM properties")
 	if err != nil {
 		return nil, err
 	}
@@ -29,6 +29,7 @@ func (r *PropertyRepository) GetAll() ([]models.Property, error) {
 			&p.Price,
 			&p.Surface,
 			&p.AgencyID,
+			&p.IsSold,
 			&p.CreatedAt,
 		)
 		if err != nil {
@@ -48,9 +49,9 @@ func (r *PropertyRepository) Add(property models.Property) error {
 
 func (r *PropertyRepository) FindWithFilters(filter models.PropertyFilter) ([]models.Property, error) {
 	query := `
-		SELECT id, title, description, city, price, surface, agency_id
-		FROM properties
-		WHERE 1=1
+	SELECT id, title, description, city, price, surface, agency_id, is_sold, created_at
+	FROM properties
+	WHERE 1=1
 	`
 	args := []interface{}{}
 	argID := 1
@@ -96,6 +97,8 @@ func (r *PropertyRepository) FindWithFilters(filter models.PropertyFilter) ([]mo
 			&p.Price,
 			&p.Surface,
 			&p.AgencyID,
+			&p.IsSold,
+			&p.CreatedAt,
 		)
 		if err != nil {
 			return nil, err

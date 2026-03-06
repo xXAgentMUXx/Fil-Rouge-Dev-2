@@ -3,7 +3,7 @@ package models
 import "time"
 
 type Property struct {
-	ID          string
+	ID          int
 	Title       string
 	Description string
 	City        string
@@ -11,4 +11,5 @@ type Property struct {
 	Surface     int
 	AgencyID    string
 	CreatedAt   time.Time
+	IsSold      bool
 }

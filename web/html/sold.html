@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Paiement propriété</title>
+</head>
+
+<body>
+
+<h1>Paiement de la propriété</h1>
+
+<p>ID propriété : {{.PropertyID}}</p>
+<p>Prix : {{.Price}} €</p>
+
+<form action="/pay-property" method="POST">
+    <input type="hidden" name="property_id" value="{{.PropertyID}}">
+    <input type="hidden" name="price" value="{{.Price}}">
+    <button type="submit">Payer avec Stripe</button>
+</form>
+
+<a href="/">Retour</a>
+
+</body>
+</html>

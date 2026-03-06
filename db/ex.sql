@@ -24,9 +24,19 @@ CREATE TABLE properties (
 );
 
 CREATE TABLE sales (
-    id UUID PRIMARY KEY,
-    property_id UUID REFERENCES properties(id),
-    buyer_id UUID REFERENCES users(id),
-    sale_price DECIMAL,
+    id SERIAL PRIMARY KEY,
+    property_id INTEGER NOT NULL REFERENCES properties(id),
+    buyer_id INTEGER NOT NULL REFERENCES users(id),
+    sale_price DECIMAL NOT NULL,
     sold_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE payments (
+    id SERIAL PRIMARY KEY,
+    property_id INT REFERENCES properties(id),
+    buyer_id INT REFERENCES users(id),
+    amount NUMERIC,
+    stripe_session_id TEXT,
+    status TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
