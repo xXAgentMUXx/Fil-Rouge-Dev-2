@@ -32,3 +32,31 @@ func (s *PaymentService) CreatePayment(payment models.Payment) error {
 func (s *PaymentService) ConfirmPayment(sessionID string) error {
 	return s.Repo.UpdateStatus(sessionID, "paid")
 }
+
+func (s *PropertyService) UpdateProperty(property models.Property) error {
+	return s.Repo.Update(property)
+}
+
+func (s *PropertyService) GetProperty(id int) (models.Property, error) {
+	return s.Repo.GetByID(id)
+}
+
+func (s *PropertyService) DeleteProperty(id int) error {
+	return s.Repo.Delete(id)
+}
+
+func (s *PropertyService) GetTotalSales() (float64, error) {
+	return s.Repo.GetTotalSales()
+}
+
+func (s *PropertyService) GetTotalSoldProperties() (int, error) {
+	return s.Repo.GetTotalSoldProperties()
+}
+
+func (s *PropertyService) GetTopCities() ([]models.CityStats, error) {
+	return s.Repo.GetTopCities()
+}
+
+func (s *PropertyService) GetMostExpensive() ([]models.Property, error) {
+	return s.Repo.GetMostExpensive()
+}

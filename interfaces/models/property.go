@@ -10,6 +10,7 @@ type Property struct {
 	Price       float64
 	Surface     int
 	AgencyID    string
+	AgentID     int
 	CreatedAt   time.Time
 	IsSold      bool
 }

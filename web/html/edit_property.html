@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link rel="stylesheet" href="../web/css/index.css">
+
+<title>Modifier la propriété</title>
+</head>
+
+<body>
+
+<h1>Modifier la propriété</h1>
+
+<a href="/properties">⬅ Retour</a>
+
+<form action="/update-property" method="POST" class="edit-form">
+
+<input type="hidden" name="id" value="{{.ID}}">
+
+<label>Titre</label>
+<input type="text" name="title" value="{{.Title}}" required>
+
+<label>Description</label>
+<textarea name="description" required>{{.Description}}</textarea>
+
+<label>Ville</label>
+<input type="text" name="city" value="{{.City}}" required>
+
+<label>Prix</label>
+<input type="number" name="price" value="{{.Price}}" required>
+
+<label>Surface</label>
+<input type="number" name="surface" value="{{.Surface}}" required>
+
+<button type="submit">
+Sauvegarder les modifications
+</button>
+
+</form>
+
+</body>
+</html>

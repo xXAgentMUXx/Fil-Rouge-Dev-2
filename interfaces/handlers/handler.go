@@ -267,6 +267,13 @@ func (h *PropertyHandler) AddProperty(w http.ResponseWriter, r *http.Request) {
             http.Error(w, "L'agence spécifiée n'existe pas.", http.StatusBadRequest)
             return
         }
+		cookie, _ := r.Cookie("session")
+
+		var agentID int
+		DB.QueryRow(
+			"SELECT id FROM users WHERE email=$1",
+			cookie.Value,
+		).Scan(&agentID)
 
         price, err := strconv.ParseFloat(priceStr, 64)
         if err != nil {
@@ -282,13 +289,14 @@ func (h *PropertyHandler) AddProperty(w http.ResponseWriter, r *http.Request) {
             return
         }
         property := models.Property{
-            Title:       title,
-            Description: description,
-            City:        city,
-            Price:       price,
-            Surface:     surface,
-            AgencyID:    agencyID, 
-        }
+			Title:       title,
+			Description: description,
+			City:        city,
+			Price:       price,
+			Surface:     surface,
+			AgencyID:    agencyID,
+			AgentID:     agentID,
+		}
 
         err = h.Service.AddProperty(property)
         if err != nil {
@@ -512,3 +520,113 @@ func PaymentSuccess(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/properties", http.StatusSeeOther)
 }
 
+func (h *PropertyHandler) EditProperty(w http.ResponseWriter, r *http.Request) {
+
+	idStr := r.URL.Query().Get("id")
+	id, _ := strconv.Atoi(idStr)
+
+	property, err := h.Service.GetProperty(id)
+
+	if err != nil {
+		http.Error(w, "Propriété introuvable", 404)
+		return
+	}
+
+	tmpl := template.Must(template.ParseFiles("web/html/edit_property.html"))
+	tmpl.Execute(w, property)
+}
+
+func (h *PropertyHandler) UpdateProperty(w http.ResponseWriter, r *http.Request) {
+
+	id, _ := strconv.Atoi(r.FormValue("id"))
+
+	property, err := h.Service.GetProperty(id)
+	if err != nil {
+		http.Error(w, "Propriété introuvable", 404)
+		return
+	}
+
+	cookie, _ := r.Cookie("session")
+
+	var userID int
+	DB.QueryRow(
+		"SELECT id FROM users WHERE email=$1",
+		cookie.Value,
+	).Scan(&userID)
+
+	if property.AgentID != userID {
+		http.Error(w, "Non autorisé", 403)
+		return
+	}
+
+	property.Title = r.FormValue("title")
+	property.Description = r.FormValue("description")
+	property.City = r.FormValue("city")
+
+	price, _ := strconv.ParseFloat(r.FormValue("price"), 64)
+	surface, _ := strconv.Atoi(r.FormValue("surface"))
+
+	property.Price = price
+	property.Surface = surface
+
+	err = h.Service.UpdateProperty(property)
+
+	if err != nil {
+		http.Error(w, "Erreur update", 500)
+		return
+	}
+
+	http.Redirect(w, r, "/properties", http.StatusSeeOther)
+}
+
+func (h *PropertyHandler) DeleteProperty(w http.ResponseWriter, r *http.Request) {
+
+	id, _ := strconv.Atoi(r.FormValue("id"))
+
+	property, err := h.Service.GetProperty(id)
+
+	if err != nil {
+		http.Error(w, "Propriété introuvable", 404)
+		return
+	}
+
+	cookie, _ := r.Cookie("session")
+
+	var userID int
+	DB.QueryRow(
+		"SELECT id FROM users WHERE email=$1",
+		cookie.Value,
+	).Scan(&userID)
+
+	if property.AgentID != userID {
+		http.Error(w, "Non autorisé", 403)
+		return
+	}
+
+	err = h.Service.DeleteProperty(id)
+
+	if err != nil {
+		http.Error(w, "Erreur suppression", 500)
+		return
+	}
+
+	http.Redirect(w, r, "/properties", http.StatusSeeOther)
+}
+
+func (h *PropertyHandler) Dashboard(w http.ResponseWriter, r *http.Request) {
+
+	totalSales, _ := h.Service.GetTotalSales()
+	totalSold, _ := h.Service.GetTotalSoldProperties()
+	topCities, _ := h.Service.GetTopCities()
+	expensiveProperties, _ := h.Service.GetMostExpensive()
+
+	data := map[string]interface{}{
+		"TotalSales": totalSales,
+		"TotalSold": totalSold,
+		"TopCities": topCities,
+		"ExpensiveProperties": expensiveProperties,
+	}
+
+	tmpl := template.Must(template.ParseFiles("web/html/dashboard.html"))
+	tmpl.Execute(w, data)
+}

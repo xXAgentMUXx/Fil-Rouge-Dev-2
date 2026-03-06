@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Dashboard Admin</title>
+</head>
+
+<body>
+
+<h1>📊 Dashboard Admin</h1>
+
+<h2>Statistiques</h2>
+
+<p>Total des ventes : {{.TotalSales}} €</p>
+<p>Biens vendus : {{.TotalSold}}</p>
+
+<h2>🌍 Villes populaires</h2>
+
+<ul>
+{{range .TopCities}}
+<li>{{.City}} : {{.Total}} biens</li>
+{{end}}
+</ul>
+
+<h2>💎 Biens les plus chers</h2>
+
+<ul>
+{{range .ExpensiveProperties}}
+<li>{{.Title}} - {{.City}} - {{.Price}} €</li>
+{{end}}
+</ul>
+
+</body>
+</html>

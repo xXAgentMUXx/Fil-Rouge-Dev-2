@@ -7,62 +7,101 @@
     <title>Y-Plaza - Accueil</title>
 </head>
 <body>
-    <a href="/logout" class="logout">Déconnexion</a>
-    <a href="/favorites">⭐ Mes favoris</a>
-    <a href="/profile" class="profile-btn">Mon Profil</a>
 
-    <h1>Bienvenue sur Y-Plaza</h1>
+<a href="/logout" class="logout">Déconnexion</a>
+<a href="/favorites">⭐ Mes favoris</a>
+<a href="/profile" class="profile-btn">Mon Profil</a>
 
-    <h2>Nos Propriétés</h2>
+{{if eq .UserRole "admin"}}
+<a href="/dashboard">📊 Dashboard</a>
+{{end}}
 
-    <form method="GET" action="/properties" class="search-form">
-        <input type="text" name="city" placeholder="Ville">
-        <input type="number" name="min_price" placeholder="Prix min">
-        <input type="number" name="max_price" placeholder="Prix max">
-        <input type="number" name="min_surface" placeholder="Surface min">
-        <button type="submit">Rechercher</button>
-    </form>
+<h1>Bienvenue sur Y-Plaza</h1>
 
-    <div class="property-list">
+<h2>Nos Propriétés</h2>
+
+<form method="GET" action="/properties" class="search-form">
+    <input type="text" name="city" placeholder="Ville">
+    <input type="number" name="min_price" placeholder="Prix min">
+    <input type="number" name="max_price" placeholder="Prix max">
+    <input type="number" name="min_surface" placeholder="Surface min">
+    <button type="submit">Rechercher</button>
+</form>
+
+<div class="property-list">
+
 {{range .Properties}}
+
 <div class="property-card">
+
 <h3>{{.Title}}</h3>
+
 <p>{{.Description}}</p>
+
 <p>Ville : {{.City}}</p>
+
 <p>Prix : {{.Price}} €</p>
+
 <p>Surface : {{.Surface}} m²</p>
+
 {{if .IsSold}}
+
 <p class="sold">Propriété achetée</p>
+
 {{else}}
 
     {{if eq $.UserRole "client"}}
-        <form action="/pay-property" method="POST">
-            <input type="hidden" name="property_id" value="{{.ID}}">
-            <input type="hidden" name="price" value="{{.Price}}">
-            <button type="submit">Acheter</button>
-        </form>
+    <form action="/pay-property" method="POST">
+        <input type="hidden" name="property_id" value="{{.ID}}">
+        <input type="hidden" name="price" value="{{.Price}}">
+        <button type="submit">Acheter</button>
+    </form>
     {{end}}
 
     {{if or (eq $.UserRole "agent") (eq $.UserRole "admin")}}
-        <form method="POST" action="/sell-property">
-            <input type="hidden" name="property_id" value="{{.ID}}">
-            <input type="number" name="buyer_id" placeholder="ID acheteur" required>
-            <input type="number" name="sale_price" placeholder="Prix de vente" required>
-            <button type="submit">Vendre</button>
-        </form>
+    <form method="POST" action="/sell-property">
+        <input type="hidden" name="property_id" value="{{.ID}}">
+        <input type="number" name="buyer_id" placeholder="ID acheteur" required>
+        <input type="number" name="sale_price" placeholder="Prix de vente" required>
+        <button type="submit">Vendre</button>
+    </form>
     {{end}}
+
     <form action="/favorite/add" method="POST">
-    <input type="hidden" name="property_id" value="{{.ID}}">
-    <button type="submit">❤️ Favori</button>
+        <input type="hidden" name="property_id" value="{{.ID}}">
+        <button type="submit">❤️ Favori</button>
     </form>
 
+    {{if or (eq $.UserRole "agent") (eq $.UserRole "admin")}}
+
+    <a href="/edit-property?id={{.ID}}" class="edit-btn">
+        ✏️ Modifier
+    </a>
+
+    <form action="/delete-property" method="POST" style="display:inline;">
+        <input type="hidden" name="id" value="{{.ID}}">
+        <button type="submit" class="delete-btn">
+            🗑 Supprimer
+        </button>
+    </form>
+
+    {{end}}
+
 {{end}}
-</div>
-{{end}}
+
 </div>
 
-    {{if or (eq .UserRole "agent") (eq .UserRole "admin")}}
-    <a href="/add-property" class="add-property-btn">Ajouter une Propriété</a>
-    {{end}}
+{{end}}
+
+</div>
+
+{{if or (eq .UserRole "agent") (eq .UserRole "admin")}}
+
+<a href="/add-property" class="add-property-btn">
+Ajouter une Propriété
+</a>
+
+{{end}}
+
 </body>
 </html>
