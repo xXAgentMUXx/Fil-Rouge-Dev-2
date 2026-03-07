@@ -4,10 +4,17 @@ import (
 	web "filrouge/interfaces/handlers"
 	"filrouge/interfaces/repositories"
 	"filrouge/interfaces/services"
+	"log"
 	"net/http"
+
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Println("Pas de fichier .env trouvé")
+	}
 	web.InitDB()
 	propertyRepo := &repositories.PropertyRepository{DB: web.DB}
 	propertyService := &services.PropertyService{Repo: propertyRepo}

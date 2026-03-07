@@ -1,0 +1,80 @@
+body{
+font-family:system-ui, sans-serif;
+background:#f5f7fb;
+margin:0;
+padding:40px;
+color:#111;
+}
+h1{
+margin-bottom:10px;
+}
+a{
+text-decoration:none;
+color:#2563eb;
+font-weight:500;
+}
+a:hover{
+text-decoration:underline;
+}
+.edit-form{
+max-width:700px;
+margin:30px auto;
+background:white;
+padding:40px;
+border-radius:12px;
+box-shadow:0 10px 30px rgba(0,0,0,0.08);
+display:flex;
+flex-direction:column;
+gap:14px;
+}
+.edit-form label{
+font-weight:600;
+margin-top:10px;
+}
+.edit-form input,
+.edit-form textarea{
+padding:12px;
+border:1px solid #ddd;
+border-radius:6px;
+font-size:14px;
+}
+.edit-form textarea{
+min-height:120px;
+resize:vertical;
+}
+.edit-form input:focus,
+.edit-form textarea:focus{
+outline:none;
+border-color:#2563eb;
+}
+
+.edit-form img{
+margin-top:10px;
+border-radius:8px;
+box-shadow:0 5px 15px rgba(0,0,0,0.15);
+max-width:300px;
+}
+.edit-form button{
+margin-top:20px;
+background:#2563eb;
+color:white;
+border:none;
+padding:14px;
+font-size:16px;
+border-radius:8px;
+cursor:pointer;
+transition:0.2s;
+}
+.edit-form button:hover{
+background:#1e40af;
+transform:translateY(-2px);
+}
+@media (max-width:768px){
+
+body{
+padding:20px;
+}
+.edit-form{
+padding:25px;
+}
+}

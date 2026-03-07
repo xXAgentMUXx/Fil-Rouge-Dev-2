@@ -1,0 +1,75 @@
+.form-container{
+max-width:900px;
+margin:60px auto;
+background:white;
+padding:40px;
+border-radius:12px;
+box-shadow:0 10px 30px rgba(0,0,0,0.08);
+}
+.form-container h1{
+margin-bottom:30px;
+}
+.property-form{
+display:flex;
+flex-direction:column;
+gap:20px;
+}
+.form-grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:20px;
+}
+.form-group{
+display:flex;
+flex-direction:column;
+gap:6px;
+}
+.form-group label{
+font-weight:600;
+}
+.property-form input,
+.property-form textarea,
+.property-form select{
+padding:12px;
+border-radius:6px;
+border:1px solid #ddd;
+font-size:14px;
+}
+.property-form textarea{
+min-height:120px;
+resize:vertical;
+}
+.property-form input:focus,
+.property-form textarea:focus,
+.property-form select:focus{
+outline:none;
+border-color:#2563eb;
+}
+.image-upload input{
+padding:6px;
+}
+.primary-btn{
+background:#2563eb;
+color:white;
+border:none;
+padding:14px;
+font-size:16px;
+border-radius:8px;
+cursor:pointer;
+
+transition:0.2s;
+
+}
+.primary-btn:hover{
+background:#1e40af;
+transform:translateY(-2px);
+}
+@media (max-width:768px){
+.form-grid{
+grid-template-columns:1fr;
+}
+.form-container{
+margin:20px;
+padding:25px;
+}
+}

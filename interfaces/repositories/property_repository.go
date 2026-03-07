@@ -255,3 +255,38 @@ func (r *PropertyRepository) GetMostExpensive() ([]models.Property, error) {
 
 	return properties, nil
 }
+
+func (r *PropertyRepository) GetTotalProperties() (int, error) {
+
+	var total int
+
+	err := r.DB.QueryRow(`
+		SELECT COUNT(*)
+		FROM properties
+	`).Scan(&total)
+
+	return total, err
+}
+func (r *PropertyRepository) GetLatestProperties() ([]models.Property, error) {
+
+	rows, err := r.DB.Query(`
+		SELECT id, title, city, price
+		FROM properties
+		ORDER BY created_at DESC
+		LIMIT 5
+	`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var properties []models.Property
+
+	for rows.Next() {
+		var p models.Property
+		rows.Scan(&p.ID, &p.Title, &p.City, &p.Price)
+		properties = append(properties, p)
+	}
+
+	return properties, nil
+}

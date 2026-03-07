@@ -66,3 +66,11 @@ func (s *PropertyService) GetTopCities() ([]models.CityStats, error) {
 func (s *PropertyService) GetMostExpensive() ([]models.Property, error) {
 	return s.Repo.GetMostExpensive()
 }
+
+func (s *PropertyService) GetTotalProperties() (int, error) {
+	return s.Repo.GetTotalProperties()
+}
+
+func (s *PropertyService) GetLatestProperties() ([]models.Property, error) {
+	return s.Repo.GetLatestProperties()
+}

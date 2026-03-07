@@ -1,43 +1,72 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <title>Ajouter une propriété</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="../web/css/add_property.css">
+<title>Ajouter une propriété - Y-Plaza</title>
 </head>
+
 <body>
 
-<h1>Ajouter une nouvelle propriété</h1>
+<div class="form-container">
 
-<form action="/add-property" method="post" enctype="multipart/form-data">
+<h1>🏡 Ajouter une nouvelle propriété</h1>
 
-    <label for="title">Titre :</label>
-    <input type="text" name="title" required><br>
+<form action="/add-property" method="post" enctype="multipart/form-data" class="property-form">
 
-    <label for="description">Description :</label>
-    <textarea name="description" required></textarea><br>
+<div class="form-grid">
 
-    <label for="city">Ville :</label>
-    <input type="text" name="city" required><br>
+<div class="form-group">
+<label>Titre</label>
+<input type="text" name="title" placeholder="Ex : Appartement centre ville" required>
+</div>
 
-    <label for="price">Prix :</label>
-    <input type="text" name="price" required><br>
+<div class="form-group">
+<label>Ville</label>
+<input type="text" name="city" placeholder="Ex : Marseille" required>
+</div>
 
-    <label for="surface">Surface :</label>
-    <input type="text" name="surface" required><br>
+<div class="form-group">
+<label>Prix (€)</label>
+<input type="number" name="price" placeholder="Ex : 350000" required>
+</div>
 
-    <label for="agency_id">Choisir une Agence :</label>
-    <select name="agency_id" required>
-        {{range .}}
-            <option value="{{.ID}}">{{.Name}}</option>
-        {{end}}
-    </select><br>
+<div class="form-group">
+<label>Surface (m²)</label>
+<input type="number" name="surface" placeholder="Ex : 85" required>
+</div>
 
-    <label for="image">Image de la propriété :</label>
-    <input type="file" name="image" accept="image/*"><br><br>
+</div>
 
-    <input type="submit" value="Ajouter">
+<div class="form-group">
+<label>Description</label>
+<textarea name="description" placeholder="Décrivez la propriété..." required></textarea>
+</div>
+
+<div class="form-group">
+<label>Agence</label>
+<select name="agency_id" required>
+{{range .}}
+<option value="{{.ID}}">{{.Name}}</option>
+{{end}}
+</select>
+</div>
+
+<div class="form-group image-upload">
+
+<label>Image de la propriété</label>
+<input type="file" name="image" accept="image/*">
+
+</div>
+
+<button class="primary-btn" type="submit">
+Ajouter la propriété
+</button>
 
 </form>
+
+</div>
 
 </body>
 </html>

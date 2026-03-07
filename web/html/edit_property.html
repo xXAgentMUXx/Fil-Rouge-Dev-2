@@ -3,9 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<link rel="stylesheet" href="../web/css/index.css">
-
+<link rel="stylesheet" href="../web/css/edit_property.css">
 <title>Modifier la propriété</title>
 </head>
 
@@ -14,11 +12,8 @@
 <h1>Modifier la propriété</h1>
 
 <a href="/properties">⬅ Retour</a>
-
 <form action="/update-property" method="POST" class="edit-form" enctype="multipart/form-data">
-
 <input type="hidden" name="id" value="{{.ID}}">
-
 <label>Titre</label>
 <input type="text" name="title" value="{{.Title}}" required>
 

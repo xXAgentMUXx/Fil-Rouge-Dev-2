@@ -1,0 +1,46 @@
+body{
+font-family:system-ui, sans-serif;
+background:#f5f7fb;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+}
+.payment-card{
+background:white;
+padding:40px;
+border-radius:12px;
+text-align:center;
+box-shadow:0 10px 25px rgba(0,0,0,0.08);
+max-width:400px;
+width:100%;
+}
+.payment-card h1{
+margin-bottom:20px;
+}
+.price{
+font-size:28px;
+font-weight:700;
+color:#2563eb;
+margin:15px 0;
+}
+button{
+background:#22c55e;
+color:white;
+border:none;
+padding:14px 18px;
+font-size:16px;
+border-radius:8px;
+cursor:pointer;
+transition:0.2s;
+}
+button:hover{
+background:#16a34a;
+transform:translateY(-2px);
+}
+a{
+display:block;
+margin-top:20px;
+text-decoration:none;
+color:#2563eb;
+}

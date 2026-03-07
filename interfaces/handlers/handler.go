@@ -450,15 +450,17 @@ func (h *PaymentHandler) CreateCheckoutSession(w http.ResponseWriter, r *http.Re
 		http.Error(w, "Propriété déjà vendue", http.StatusBadRequest)
 		return
 	}
-	stripe.Key = "sk_test_51T7v2sPVJxAvAHPXWguzBmPqfEqWzQfMmWF3s6s9Bpm2StsMRvD6Xf3SKnCbJEB2LhH3rLtYhPvUny0dS9aw4vUS00TWfSIIRJ"
-
+	stripe.Key = os.Getenv("STRIPE_SECRET_KEY")
+	appURL := os.Getenv("APP_URL")
 	params := &stripe.CheckoutSessionParams{
 		PaymentMethodTypes: stripe.StringSlice([]string{"card"}),
 		Mode:               stripe.String(string(stripe.CheckoutSessionModePayment)),
 		SuccessURL: stripe.String(
-			"http://localhost:8080/payment-success?session_id={CHECKOUT_SESSION_ID}",
+			appURL + "/payment-success?session_id={CHECKOUT_SESSION_ID}",
 		),
-		CancelURL: stripe.String("http://localhost:8080/payment-cancel"),
+		CancelURL: stripe.String(
+			appURL + "/payment-cancel",
+		),
 
 		LineItems: []*stripe.CheckoutSessionLineItemParams{
 			{
@@ -660,14 +662,18 @@ func (h *PropertyHandler) Dashboard(w http.ResponseWriter, r *http.Request) {
 
 	totalSales, _ := h.Service.GetTotalSales()
 	totalSold, _ := h.Service.GetTotalSoldProperties()
+	totalProperties, _ := h.Service.GetTotalProperties()
 	topCities, _ := h.Service.GetTopCities()
 	expensiveProperties, _ := h.Service.GetMostExpensive()
+	latestProperties, _ := h.Service.GetLatestProperties()
 
 	data := map[string]interface{}{
 		"TotalSales": totalSales,
 		"TotalSold": totalSold,
+		"TotalProperties": totalProperties,
 		"TopCities": topCities,
 		"ExpensiveProperties": expensiveProperties,
+		"LatestProperties": latestProperties,
 	}
 
 	tmpl := template.Must(template.ParseFiles("web/html/dashboard.html"))

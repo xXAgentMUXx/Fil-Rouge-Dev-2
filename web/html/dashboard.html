@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <title>Dashboard Admin</title>
+<link rel="stylesheet" href="../web/css/dashboard.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 </head>
 
 <body>
@@ -13,6 +16,7 @@
 
 <p>Total des ventes : {{.TotalSales}} €</p>
 <p>Biens vendus : {{.TotalSold}}</p>
+<p>Total propriétés : {{.TotalProperties}}</p>
 
 <h2>🌍 Villes populaires</h2>
 
@@ -22,6 +26,10 @@
 {{end}}
 </ul>
 
+<h2>📈 Graphique des propriétés par ville</h2>
+
+<canvas id="citiesChart" width="400" height="200"></canvas>
+
 <h2>💎 Biens les plus chers</h2>
 
 <ul>
@@ -29,6 +37,46 @@
 <li>{{.Title}} - {{.City}} - {{.Price}} €</li>
 {{end}}
 </ul>
+
+<h2>🆕 Dernières propriétés</h2>
+
+<ul>
+{{range .LatestProperties}}
+<li>{{.Title}} - {{.City}} - {{.Price}} €</li>
+{{end}}
+</ul>
+
+<script>
+
+const cities = [
+{{range .TopCities}}
+"{{.City}}",
+{{end}}
+];
+
+const totals = [
+{{range .TopCities}}
+{{.Total}},
+{{end}}
+];
+
+const ctx = document.getElementById('citiesChart');
+
+new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: cities,
+        datasets: [{
+            label: 'Nombre de propriétés',
+            data: totals
+        }]
+    },
+    options: {
+        responsive: true
+    }
+});
+
+</script>
 
 </body>
 </html>
