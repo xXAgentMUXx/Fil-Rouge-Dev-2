@@ -1,0 +1,13 @@
+save.txt :
+
+docker compose up --build
+
+docker compose down -v
+
+docker exec -it postgres_real_estate psql -U postgres -d realestate
+
+select vdisk file="C:\Users\urban\AppData\Local\Docker\wsl\disk\docker_data.vhdx"
+attach vdisk readonly
+compact vdisk
+detach vdisk
+exit
