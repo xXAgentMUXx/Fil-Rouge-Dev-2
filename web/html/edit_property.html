@@ -15,7 +15,7 @@
 
 <a href="/properties">⬅ Retour</a>
 
-<form action="/update-property" method="POST" class="edit-form">
+<form action="/update-property" method="POST" class="edit-form" enctype="multipart/form-data">
 
 <input type="hidden" name="id" value="{{.ID}}">
 
@@ -33,6 +33,12 @@
 
 <label>Surface</label>
 <input type="number" name="surface" value="{{.Surface}}" required>
+
+<label>Image</label>
+<input type="file" name="image">
+
+<p>Image actuelle :</p>
+<img src="{{.Image}}" width="200">
 
 <button type="submit">
 Sauvegarder les modifications

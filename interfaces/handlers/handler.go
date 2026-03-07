@@ -9,6 +9,8 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"io"
+	"os"
 
 	_ "github.com/lib/pq"
 
@@ -252,21 +254,27 @@ func (h *PropertyHandler) ListProperties(w http.ResponseWriter, r *http.Request)
 }
 
 func (h *PropertyHandler) AddProperty(w http.ResponseWriter, r *http.Request) {
-    if r.Method == http.MethodPost {
-        title := r.FormValue("title")
-        description := r.FormValue("description")
-        city := r.FormValue("city")
-        priceStr := r.FormValue("price")       
-        surfaceStr := r.FormValue("surface")   
-        agencyID := r.FormValue("agency_id")  
+	if r.Method == http.MethodPost {
 
-        var agencyExists bool
-        err := DB.QueryRow("SELECT EXISTS (SELECT 1 FROM agencies WHERE id = $1)", agencyID).Scan(&agencyExists)
-        if err != nil || !agencyExists {
-            log.Println("L'agence avec l'ID", agencyID, "n'existe pas.")
-            http.Error(w, "L'agence spécifiée n'existe pas.", http.StatusBadRequest)
-            return
-        }
+		title := r.FormValue("title")
+		description := r.FormValue("description")
+		city := r.FormValue("city")
+		priceStr := r.FormValue("price")
+		surfaceStr := r.FormValue("surface")
+		agencyID := r.FormValue("agency_id")
+
+		var agencyExists bool
+		err := DB.QueryRow(
+			"SELECT EXISTS (SELECT 1 FROM agencies WHERE id = $1)",
+			agencyID,
+		).Scan(&agencyExists)
+
+		if err != nil || !agencyExists {
+			log.Println("L'agence avec l'ID", agencyID, "n'existe pas.")
+			http.Error(w, "L'agence spécifiée n'existe pas.", http.StatusBadRequest)
+			return
+		}
+
 		cookie, _ := r.Cookie("session")
 
 		var agentID int
@@ -275,20 +283,45 @@ func (h *PropertyHandler) AddProperty(w http.ResponseWriter, r *http.Request) {
 			cookie.Value,
 		).Scan(&agentID)
 
-        price, err := strconv.ParseFloat(priceStr, 64)
-        if err != nil {
-            log.Println("Erreur conversion prix:", err)
-            http.Error(w, "Prix invalide", http.StatusBadRequest)
-            return
-        }
+		price, err := strconv.ParseFloat(priceStr, 64)
+		if err != nil {
+			log.Println("Erreur conversion prix:", err)
+			http.Error(w, "Prix invalide", http.StatusBadRequest)
+			return
+		}
 
-        surface, err := strconv.Atoi(surfaceStr)
-        if err != nil {
-            log.Println("Erreur conversion surface:", err)
-            http.Error(w, "Surface invalide", http.StatusBadRequest)
-            return
-        }
-        property := models.Property{
+		surface, err := strconv.Atoi(surfaceStr)
+		if err != nil {
+			log.Println("Erreur conversion surface:", err)
+			http.Error(w, "Surface invalide", http.StatusBadRequest)
+			return
+		}
+
+		// -------------------------------
+		// Upload image (optionnel)
+		// -------------------------------
+
+		var imagePath string
+
+		file, handler, err := r.FormFile("image")
+
+		if err == nil {
+			defer file.Close()
+
+			os.MkdirAll("web/uploads", os.ModePerm)
+
+			dst, err := os.Create("web/uploads/" + handler.Filename)
+			if err == nil {
+				defer dst.Close()
+
+				_, err = io.Copy(dst, file)
+				if err == nil {
+					imagePath = "/uploads/" + handler.Filename
+				}
+			}
+		}
+
+		property := models.Property{
 			Title:       title,
 			Description: description,
 			City:        city,
@@ -296,40 +329,44 @@ func (h *PropertyHandler) AddProperty(w http.ResponseWriter, r *http.Request) {
 			Surface:     surface,
 			AgencyID:    agencyID,
 			AgentID:     agentID,
+			Image:       imagePath,
 		}
 
-        err = h.Service.AddProperty(property)
-        if err != nil {
-            log.Println("Erreur ajout propriété:", err)
-            http.Error(w, "Erreur serveur", http.StatusInternalServerError)
-            return
-        }
+		err = h.Service.AddProperty(property)
+		if err != nil {
+			log.Println("Erreur ajout propriété:", err)
+			http.Error(w, "Erreur serveur", http.StatusInternalServerError)
+			return
+		}
 
-        
-        http.Redirect(w, r, "/properties", http.StatusSeeOther)
-        return
-    }
+		http.Redirect(w, r, "/properties", http.StatusSeeOther)
+		return
+	}
 
-    rows, err := DB.Query("SELECT id, name FROM agencies")
-    if err != nil {
-        log.Println("Erreur lors de la récupération des agences:", err)
-        http.Error(w, "Erreur serveur", http.StatusInternalServerError)
-        return
-    }
-    defer rows.Close()
+	rows, err := DB.Query("SELECT id, name FROM agencies")
+	if err != nil {
+		log.Println("Erreur lors de la récupération des agences:", err)
+		http.Error(w, "Erreur serveur", http.StatusInternalServerError)
+		return
+	}
+	defer rows.Close()
 
-    var agencies []models.Agency
-    for rows.Next() {
-        var agency models.Agency
-        if err := rows.Scan(&agency.ID, &agency.Name); err != nil {
-            log.Println("Erreur de scan des agences:", err)
-            http.Error(w, "Erreur serveur", http.StatusInternalServerError)
-            return
-        }
-        agencies = append(agencies, agency)
-    }
-    tmpl := template.Must(template.ParseFiles("web/html/add_property.html"))
-    tmpl.Execute(w, agencies)
+	var agencies []models.Agency
+
+	for rows.Next() {
+		var agency models.Agency
+
+		if err := rows.Scan(&agency.ID, &agency.Name); err != nil {
+			log.Println("Erreur de scan des agences:", err)
+			http.Error(w, "Erreur serveur", http.StatusInternalServerError)
+			return
+		}
+
+		agencies = append(agencies, agency)
+	}
+
+	tmpl := template.Must(template.ParseFiles("web/html/add_property.html"))
+	tmpl.Execute(w, agencies)
 }
 
 type SaleHandler struct {
@@ -537,42 +574,48 @@ func (h *PropertyHandler) EditProperty(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *PropertyHandler) UpdateProperty(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseMultipartForm(10 << 20)
+	if err != nil {
+		http.Error(w, "Erreur formulaire", http.StatusBadRequest)
+		return
+	}
 
 	id, _ := strconv.Atoi(r.FormValue("id"))
+	title := r.FormValue("title")
+	description := r.FormValue("description")
+	city := r.FormValue("city")
 
-	property, err := h.Service.GetProperty(id)
-	if err != nil {
-		http.Error(w, "Propriété introuvable", 404)
-		return
+	file, handler, err := r.FormFile("image")
+
+	var filename string
+
+	if err == nil {
+		defer file.Close()
+
+		filename = handler.Filename
+		path := "web/uploads/" + filename
+
+		dst, err := os.Create(path)
+		if err != nil {
+			http.Error(w, "Erreur upload", http.StatusInternalServerError)
+			return
+		}
+		defer dst.Close()
+
+		io.Copy(dst, file)
 	}
 
-	cookie, _ := r.Cookie("session")
-
-	var userID int
-	DB.QueryRow(
-		"SELECT id FROM users WHERE email=$1",
-		cookie.Value,
-	).Scan(&userID)
-
-	if property.AgentID != userID {
-		http.Error(w, "Non autorisé", 403)
-		return
+	property := models.Property{
+	ID:          id,
+	Title:       title,
+	Description: description,
+	City:        city,
+	Image:       filename,
 	}
-
-	property.Title = r.FormValue("title")
-	property.Description = r.FormValue("description")
-	property.City = r.FormValue("city")
-
-	price, _ := strconv.ParseFloat(r.FormValue("price"), 64)
-	surface, _ := strconv.Atoi(r.FormValue("surface"))
-
-	property.Price = price
-	property.Surface = surface
 
 	err = h.Service.UpdateProperty(property)
-
 	if err != nil {
-		http.Error(w, "Erreur update", 500)
+		http.Error(w, "Erreur serveur", http.StatusInternalServerError)
 		return
 	}
 

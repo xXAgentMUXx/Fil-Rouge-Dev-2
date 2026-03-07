@@ -22,6 +22,10 @@
 
 <div class="property-detail">
 
+<img src="{{if .Image}}{{.Image}}{{else}}/images/default-house.jpg{{end}}" 
+alt="Image propriété" 
+style="width:300px;height:auto;">
+
 <p><strong>Ville :</strong> {{.City}}</p>
 
 <p><strong>Prix :</strong> {{.Price}} €</p>

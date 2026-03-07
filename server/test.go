@@ -51,6 +51,7 @@ func main() {
 	http.HandleFunc("/delete-property",web.RequireRoles("agent","admin")(propertyHandler.DeleteProperty))
 	http.HandleFunc("/dashboard", web.RequireRoles("admin",)(propertyHandler.Dashboard))
 	http.Handle("/web/", http.StripPrefix("/web/", http.FileServer(http.Dir("web"))))
+	http.Handle("/uploads/", http.StripPrefix("/uploads/", http.FileServer(http.Dir("web/uploads"))))
 	println("Serveur lancé sur http://localhost:8080/")
 	http.ListenAndServe(":8080", nil)
 }

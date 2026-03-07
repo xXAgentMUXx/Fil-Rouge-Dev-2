@@ -11,6 +11,7 @@ type Property struct {
 	Surface     int
 	AgencyID    string
 	AgentID     int
+	Image       string
 	CreatedAt   time.Time
 	IsSold      bool
 }

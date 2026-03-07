@@ -34,7 +34,13 @@ func (s *PaymentService) ConfirmPayment(sessionID string) error {
 }
 
 func (s *PropertyService) UpdateProperty(property models.Property) error {
-	return s.Repo.Update(property)
+	return s.Repo.Update(
+		property.ID,
+		property.Title,
+		property.Description,
+		property.City,
+		property.Image,
+	)
 }
 
 func (s *PropertyService) GetProperty(id int) (models.Property, error) {

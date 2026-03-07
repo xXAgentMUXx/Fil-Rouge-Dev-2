@@ -11,7 +11,7 @@ type PropertyRepository struct {
 }
 
 func (r *PropertyRepository) GetAll() ([]models.Property, error) {
-	rows, err := r.DB.Query("SELECT id, title, description, city, price, surface, agency_id, is_sold, created_at FROM properties")
+	rows, err := r.DB.Query("SELECT id, title, description, city, price, surface, agency_id, image, is_sold, created_at FROM properties")
 	if err != nil {
 		return nil, err
 	}
@@ -29,6 +29,7 @@ func (r *PropertyRepository) GetAll() ([]models.Property, error) {
 			&p.Price,
 			&p.Surface,
 			&p.AgencyID,
+			&p.Image,
 			&p.IsSold,
 			&p.CreatedAt,
 		)
@@ -43,8 +44,8 @@ func (r *PropertyRepository) GetAll() ([]models.Property, error) {
 
 func (r *PropertyRepository) Add(property models.Property) error {
 	_, err := r.DB.Exec(
-	`INSERT INTO properties(title, description, city, price, surface, agency_id, agent_id)
-	VALUES($1,$2,$3,$4,$5,$6,$7)`,
+	`INSERT INTO properties(title, description, city, price, surface, agency_id, agent_id, image)
+	VALUES($1,$2,$3,$4,$5,$6,$7,$8)`,
 	property.Title,
 	property.Description,
 	property.City,
@@ -52,13 +53,14 @@ func (r *PropertyRepository) Add(property models.Property) error {
 	property.Surface,
 	property.AgencyID,
 	property.AgentID,
+	property.Image,
 	)
 	return err
 }
 
 func (r *PropertyRepository) FindWithFilters(filter models.PropertyFilter) ([]models.Property, error) {
 	query := `
-	SELECT id, title, description, city, price, surface, agency_id, is_sold, created_at
+	SELECT id, title, description, city, price, surface, agency_id, image, is_sold, created_at
 	FROM properties
 	WHERE 1=1
 	`
@@ -106,6 +108,7 @@ func (r *PropertyRepository) FindWithFilters(filter models.PropertyFilter) ([]mo
 			&p.Price,
 			&p.Surface,
 			&p.AgencyID,
+			&p.Image,
 			&p.IsSold,
 			&p.CreatedAt,
 		)
@@ -122,19 +125,24 @@ func itoa(i int) string {
 	return strings.TrimSpace(string(rune('0' + i)))
 }
 
-func (r *PropertyRepository) Update(property models.Property) error {
+func (r *PropertyRepository) Update(id int, title, description, city, image string) error {
+
+	if image != "" {
+
+		_, err := r.DB.Exec(`
+		UPDATE properties
+		SET title=$1, description=$2, city=$3, image=$4
+		WHERE id=$5`,
+			title, description, city, image, id)
+
+		return err
+	}
 
 	_, err := r.DB.Exec(`
 	UPDATE properties
-	SET title=$1, description=$2, city=$3, price=$4, surface=$5
-	WHERE id=$6`,
-		property.Title,
-		property.Description,
-		property.City,
-		property.Price,
-		property.Surface,
-		property.ID,
-	)
+	SET title=$1, description=$2, city=$3
+	WHERE id=$4`,
+		title, description, city, id)
 
 	return err
 }
@@ -144,7 +152,7 @@ func (r *PropertyRepository) GetByID(id int) (models.Property, error) {
 	var p models.Property
 
 	err := r.DB.QueryRow(`
-	SELECT id,title,description,city,price,surface,agency_id,agent_id,is_sold,created_at
+	SELECT id,title,description,city,price,surface,agency_id,agent_id,image,is_sold,created_at
 	FROM properties WHERE id=$1`, id).
 	Scan(
 		&p.ID,
@@ -155,6 +163,7 @@ func (r *PropertyRepository) GetByID(id int) (models.Property, error) {
 		&p.Surface,
 		&p.AgencyID,
 		&p.AgentID,
+		&p.Image,
 		&p.IsSold,
 		&p.CreatedAt,
 	)
