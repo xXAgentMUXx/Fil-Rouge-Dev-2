@@ -29,6 +29,7 @@ func main() {
 
 	http.HandleFunc("/", web.RequireAuth(propertyHandler.Mainpage))
 	http.HandleFunc("/properties", web.RequireAuth(propertyHandler.ListProperties))
+	http.HandleFunc("/property", web.RequireAuth(propertyHandler.PropertyDetail))
 	http.HandleFunc("/login", web.GetLogin)
 	http.HandleFunc("/register", web.GetRegister)
 	http.HandleFunc("/post-login", web.PostLogin)

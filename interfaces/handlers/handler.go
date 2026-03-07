@@ -630,3 +630,20 @@ func (h *PropertyHandler) Dashboard(w http.ResponseWriter, r *http.Request) {
 	tmpl := template.Must(template.ParseFiles("web/html/dashboard.html"))
 	tmpl.Execute(w, data)
 }
+
+func (h *PropertyHandler) PropertyDetail(w http.ResponseWriter, r *http.Request) {
+	idStr := r.URL.Query().Get("id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		http.Error(w, "ID invalide", http.StatusBadRequest)
+		return
+	}
+
+	property, err := h.Service.GetProperty(id)
+	if err != nil {
+		http.Error(w, "Propriété introuvable", http.StatusNotFound)
+		return
+	}
+	tmpl := template.Must(template.ParseFiles("web/html/property_detail.html"))
+	tmpl.Execute(w, property)
+}
