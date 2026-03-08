@@ -6,9 +6,17 @@ import (
 	"filrouge/interfaces/services"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/joho/godotenv"
+	"github.com/markbates/goth"
+	"github.com/markbates/goth/providers/github"
+	"github.com/markbates/goth/providers/google"
+	"github.com/gorilla/sessions"
+    "github.com/markbates/goth/gothic"
 )
+
+
 
 func main() {
 	err := godotenv.Load()
@@ -16,6 +24,23 @@ func main() {
 		log.Println("Pas de fichier .env trouvé")
 	}
 	web.InitDB()
+	secret := os.Getenv("SESSION_SECRET")
+
+	gothic.Store = sessions.NewCookieStore([]byte(secret))
+	goth.UseProviders(
+	google.New(
+		os.Getenv("GOOGLE_KEY"),
+		os.Getenv("GOOGLE_SECRET"),
+		os.Getenv("APP_URL")+"/auth/google/callback",
+		"email", "profile",
+	),
+	github.New(
+		os.Getenv("GITHUB_KEY"),
+		os.Getenv("GITHUB_SECRET"),
+		os.Getenv("APP_URL")+"/auth/github/callback",
+		"user:email",
+	),
+)
 	propertyRepo := &repositories.PropertyRepository{DB: web.DB}
 	propertyService := &services.PropertyService{Repo: propertyRepo}
 	propertyHandler := &web.PropertyHandler{Service: propertyService}
@@ -57,6 +82,8 @@ func main() {
 	http.HandleFunc("/update-property",web.RequireRoles("agent","admin")(propertyHandler.UpdateProperty))
 	http.HandleFunc("/delete-property",web.RequireRoles("agent","admin")(propertyHandler.DeleteProperty))
 	http.HandleFunc("/dashboard", web.RequireRoles("admin",)(propertyHandler.Dashboard))
+	http.HandleFunc("/auth/{provider}", web.BeginAuth)
+	http.HandleFunc("/auth/{provider}/callback", web.CallbackAuth)
 	http.Handle("/web/", http.StripPrefix("/web/", http.FileServer(http.Dir("web"))))
 	http.Handle("/uploads/", http.StripPrefix("/uploads/", http.FileServer(http.Dir("web/uploads"))))
 	println("Serveur lancé sur http://localhost:8080/")

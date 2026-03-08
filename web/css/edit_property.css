@@ -1,26 +1,37 @@
+*{
+box-sizing:border-box;
+margin:0;
+padding:0;
+}
+
 body{
 font-family:system-ui, sans-serif;
 background:#f5f7fb;
-margin:0;
-padding:40px;
 color:#111;
+padding:15px;
+}
+
+.container{
+max-width:900px;
+margin:auto;
 }
 h1{
 margin-bottom:10px;
+font-size:24px;
 }
-a{
+.back-btn{
+display:inline-block;
+margin-bottom:20px;
 text-decoration:none;
 color:#2563eb;
 font-weight:500;
 }
-a:hover{
+.back-btn:hover{
 text-decoration:underline;
 }
 .edit-form{
-max-width:700px;
-margin:30px auto;
 background:white;
-padding:40px;
+padding:25px;
 border-radius:12px;
 box-shadow:0 10px 30px rgba(0,0,0,0.08);
 display:flex;
@@ -37,6 +48,7 @@ padding:12px;
 border:1px solid #ddd;
 border-radius:6px;
 font-size:14px;
+width:100%;
 }
 .edit-form textarea{
 min-height:120px;
@@ -47,12 +59,17 @@ resize:vertical;
 outline:none;
 border-color:#2563eb;
 }
-
-.edit-form img{
+.current-image-label{
+margin-top:10px;
+font-weight:500;
+}
+.property-image{
 margin-top:10px;
 border-radius:8px;
 box-shadow:0 5px 15px rgba(0,0,0,0.15);
+width:100%;
 max-width:300px;
+height:auto;
 }
 .edit-form button{
 margin-top:20px;
@@ -69,12 +86,38 @@ transition:0.2s;
 background:#1e40af;
 transform:translateY(-2px);
 }
-@media (max-width:768px){
+@media (min-width:375px){
+.edit-form{
+padding:28px;
+}
+}
+@media (min-width:425px){
 
+.edit-form{
+padding:30px;
+}
+}
+
+@media (min-width:768px){
 body{
-padding:20px;
+padding:30px;
 }
 .edit-form{
-padding:25px;
+padding:35px;
+}
+}
+@media (min-width:1024px){
+.container{
+max-width:800px;
+}
+}
+@media (min-width:1440px){
+.container{
+max-width:900px;
+}
+}
+@media (min-width:2560px){
+.container{
+max-width:1100px;
 }
 }

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
 
 <meta charset="UTF-8">
@@ -7,28 +8,35 @@
 
 <link rel="stylesheet" href="../web/css/property_detail.css">
 
-<title>Détail propriété</title>
+<title>Détail propriété - Y-Plaza</title>
 
 </head>
 
 <body>
 
-<a href="/properties">⬅ Retour aux propriétés</a>
+<div class="container">
+
+<div class="top-bar">
+
+<a href="/properties">⬅ Retour</a>
 <a href="/favorites">⭐ Mes favoris</a>
-<a href="/profile">Mon Profil</a>
-<a href="/logout">Déconnexion</a>
+<a href="/profile">👤 Profil</a>
+<a href="/logout">🚪 Déconnexion</a>
+
+</div>
 
 <h1>{{.Title}}</h1>
 
 <div class="property-detail">
 
 <img src="{{if .Image}}{{.Image}}{{else}}/images/default-house.jpg{{end}}" 
-alt="Image propriété" 
-style="width:300px;height:auto;">
+alt="Image propriété">
+
+<div class="property-info">
 
 <p><strong>Ville :</strong> {{.City}}</p>
 
-<p><strong>Prix :</strong> {{.Price}} €</p>
+<p class="price">{{.Price}} €</p>
 
 <p><strong>Surface :</strong> {{.Surface}} m²</p>
 
@@ -36,7 +44,7 @@ style="width:300px;height:auto;">
 
 <p>{{.Description}}</p>
 
-<p><strong>Date de publication :</strong> {{.CreatedAt}}</p>
+<p class="date"><strong>Date :</strong> {{.CreatedAt}}</p>
 
 {{if .IsSold}}
 
@@ -48,7 +56,7 @@ style="width:300px;height:auto;">
 
 <input type="hidden" name="property_id" value="{{.ID}}">
 
-<button type="submit">
+<button class="buy-btn">
 Acheter cette propriété
 </button>
 
@@ -58,13 +66,17 @@ Acheter cette propriété
 
 <input type="hidden" name="property_id" value="{{.ID}}">
 
-<button type="submit">
+<button class="fav-btn">
 ❤️ Ajouter aux favoris
 </button>
 
 </form>
 
 {{end}}
+
+</div>
+
+</div>
 
 </div>
 

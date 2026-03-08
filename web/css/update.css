@@ -1,36 +1,53 @@
+*{
+box-sizing:border-box;
+margin:0;
+padding:0;
+}
+
 body{
 font-family:system-ui, sans-serif;
 background:#f5f7fb;
 display:flex;
 justify-content:center;
 align-items:center;
-height:100vh;
+min-height:100vh;
+padding:20px;
 }
+
 .account-card{
 background:white;
-padding:40px;
+padding:25px;
 border-radius:12px;
 box-shadow:0 10px 25px rgba(0,0,0,0.08);
-width:400px;
+width:100%;
+max-width:400px;
 }
+
 h2{
 margin-bottom:20px;
+font-size:22px;
 }
+
 label{
 font-weight:600;
+display:block;
+margin-bottom:6px;
 }
+
 input{
 width:100%;
 padding:12px;
 border-radius:6px;
 border:1px solid #ddd;
-margin-top:6px;
 margin-bottom:16px;
+font-size:14px;
 }
+
 input:focus{
 outline:none;
 border-color:#2563eb;
 }
+
 button{
 width:100%;
 background:#2563eb;
@@ -45,4 +62,45 @@ transition:0.2s;
 
 button:hover{
 background:#1e40af;
+}
+
+.back-btn{
+display:block;
+margin-top:20px;
+text-align:center;
+text-decoration:none;
+color:#2563eb;
+font-weight:500;
+}
+
+.back-btn:hover{
+text-decoration:underline;
+}
+
+@media (min-width:375px){
+.account-card{
+padding:30px;
+}
+}
+
+@media (min-width:425px){
+h2{
+font-size:24px;
+}
+}
+@media (min-width:768px){
+.account-card{
+padding:35px;
+max-width:420px;
+}
+}
+@media (min-width:1024px){
+.account-card{
+max-width:450px;
+}
+}
+@media (min-width:1440px){
+.account-card{
+max-width:500px;
+}
 }

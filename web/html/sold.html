@@ -1,26 +1,33 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="../web/css/sold.css">
-<title>Ajouter une propriété - Y-Plaza</title>
+<title>Paiement - Y-Plaza</title>
 </head>
 
 <body>
 
+<div class="payment-card">
+
 <h1>Paiement de la propriété</h1>
 
 <p>ID propriété : {{.PropertyID}}</p>
-<p>Prix : {{.Price}} €</p>
+
+<p class="price">{{.Price}} €</p>
 
 <form action="/pay-property" method="POST">
-    <input type="hidden" name="property_id" value="{{.PropertyID}}">
-    <input type="hidden" name="price" value="{{.Price}}">
-    <button type="submit">Payer avec Stripe</button>
+
+<input type="hidden" name="property_id" value="{{.PropertyID}}">
+<input type="hidden" name="price" value="{{.Price}}">
+
+<button type="submit">
+💳 Payer avec Stripe
+</button>
 </form>
-
-<a href="/">Retour</a>
-
+<a href="/" class="back-btn">⬅ Retour</a>
+</div>
 </body>
 </html>

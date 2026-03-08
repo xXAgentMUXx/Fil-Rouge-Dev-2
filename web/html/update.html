@@ -1,26 +1,47 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="../web/css/update.css">
-<title>Ajouter une propriété - Y-Plaza</title>
+<title>Modifier mon compte - Y-Plaza</title>
 </head>
+
 <body>
+
+<div class="account-card">
+
 <h2>Modifier mon compte</h2>
+
+{{ if ne .Provider "local" }}
+
+<p>Votre compte est connecté via {{ .Provider }}</p>
+<p>Créez un mot de passe pour activer la connexion email.</p>
+
+{{ end }}
 
 <form action="/update-account" method="POST">
 
-<label>Nouvel email</label><br>
+<label>Nouvel email</label>
 <input type="email" name="email" required>
 
-<br><br>
-
-<label>Nouveau mot de passe</label><br>
+<label>Mot de passe</label>
 <input type="password" name="password" required>
-<br><br>
-<button type="submit">Modifier</button>
+
+<button type="submit">
+{{ if ne .Provider "local" }}
+Créer mot de passe
+{{ else }}
+Modifier
+{{ end }}
+</button>
+
 </form>
-<br>
+
+<a href="/profile" class="back-btn">⬅ Retour au profil</a>
+
+</div>
+
 </body>
 </html>

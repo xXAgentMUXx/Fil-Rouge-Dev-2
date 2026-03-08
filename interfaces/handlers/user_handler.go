@@ -12,6 +12,7 @@ type UserHandler struct{}
 type ProfileData struct {
 	Email     string
 	Role      string
+	Provider  string
 	Purchases []string
 	Sales     []string
 }
@@ -26,11 +27,12 @@ func (h *UserHandler) ProfilePage(w http.ResponseWriter, r *http.Request) {
 
 	var email string
 	var role string
+	var provider string
 
 	err = DB.QueryRow(
-		"SELECT email, role FROM users WHERE email=$1",
+		"SELECT email, role, provider FROM users WHERE email=$1",
 		cookie.Value,
-	).Scan(&email, &role)
+	).Scan(&email, &role, &provider)
 
 	if err != nil {
 		http.Error(w, "Utilisateur introuvable", 500)
@@ -80,10 +82,11 @@ func (h *UserHandler) ProfilePage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	data := ProfileData{
-		Email:     email,
-		Role:      role,
-		Purchases: purchases,
-		Sales:     sales,
+	Email: email,
+	Role: role,
+	Provider: provider,
+	Purchases: purchases,
+	Sales: sales,
 	}
 
 	tmpl := template.Must(template.ParseFiles("web/html/profile.html"))
@@ -106,18 +109,42 @@ func (h *UserHandler) UpdateAccount(w http.ResponseWriter, r *http.Request) {
 	newEmail := r.FormValue("email")
 	newPassword := r.FormValue("password")
 
+	var provider string
+
+	err = DB.QueryRow(
+		"SELECT provider FROM users WHERE email=$1",
+		cookie.Value,
+	).Scan(&provider)
+
+	if err != nil {
+		http.Error(w, "Utilisateur introuvable", 500)
+		return
+	}
+
 	hash, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.DefaultCost)
 	if err != nil {
 		http.Error(w, "Erreur hash password", 500)
 		return
 	}
 
-	_, err = DB.Exec(
-		"UPDATE users SET email=$1, password=$2 WHERE email=$3",
-		newEmail,
-		string(hash),
-		cookie.Value,
-	)
+	if provider != "local" {
+
+		_, err = DB.Exec(
+			"UPDATE users SET email=$1, password=$2, provider='local' WHERE email=$3",
+			newEmail,
+			string(hash),
+			cookie.Value,
+		)
+
+	} else {
+
+		_, err = DB.Exec(
+			"UPDATE users SET email=$1, password=$2 WHERE email=$3",
+			newEmail,
+			string(hash),
+			cookie.Value,
+		)
+	}
 
 	if err != nil {
 		http.Error(w, "Erreur mise à jour compte", 500)
@@ -135,12 +162,30 @@ func (h *UserHandler) UpdateAccount(w http.ResponseWriter, r *http.Request) {
 
 func (h *UserHandler) UpdatePage(w http.ResponseWriter, r *http.Request) {
 
-	_, err := r.Cookie("session")
+	cookie, err := r.Cookie("session")
 	if err != nil {
 		http.Redirect(w, r, "/login", http.StatusSeeOther)
 		return
 	}
 
+	var provider string
+
+	err = DB.QueryRow(
+		"SELECT provider FROM users WHERE email=$1",
+		cookie.Value,
+	).Scan(&provider)
+
+	if err != nil {
+		http.Error(w, "Utilisateur introuvable", 500)
+		return
+	}
+
+	data := struct {
+		Provider string
+	}{
+		Provider: provider,
+	}
+
 	tmpl := template.Must(template.ParseFiles("web/html/update.html"))
-	tmpl.Execute(w, nil)
+	tmpl.Execute(w, data)
 }

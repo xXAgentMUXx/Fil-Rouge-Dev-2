@@ -1,14 +1,22 @@
+*{
+box-sizing:border-box;
+margin:0;
+padding:0;
+}
+
 body{
 font-family:system-ui, sans-serif;
 background:#f5f7fb;
 display:flex;
 justify-content:center;
 align-items:center;
-height:100vh;
+min-height:100vh;
+padding:20px;
 }
+
 .payment-card{
 background:white;
-padding:40px;
+padding:25px;
 border-radius:12px;
 text-align:center;
 box-shadow:0 10px 25px rgba(0,0,0,0.08);
@@ -17,9 +25,10 @@ width:100%;
 }
 .payment-card h1{
 margin-bottom:20px;
+font-size:22px;
 }
 .price{
-font-size:28px;
+font-size:26px;
 font-weight:700;
 color:#2563eb;
 margin:15px 0;
@@ -33,14 +42,44 @@ font-size:16px;
 border-radius:8px;
 cursor:pointer;
 transition:0.2s;
+width:100%;
 }
 button:hover{
 background:#16a34a;
 transform:translateY(-2px);
 }
-a{
+.back-btn{
 display:block;
 margin-top:20px;
 text-decoration:none;
 color:#2563eb;
+font-weight:500;
+}
+.back-btn:hover{
+text-decoration:underline;
+}
+@media (min-width:375px){
+.payment-card{
+padding:30px;
+}
+}
+@media (min-width:425px){
+.price{
+font-size:28px;
+}
+}
+@media (min-width:768px){
+.payment-card{
+padding:35px;
+}
+}
+@media (min-width:1024px){
+.payment-card{
+max-width:450px;
+}
+}
+@media (min-width:1440px){
+.payment-card{
+max-width:500px;
+}
 }

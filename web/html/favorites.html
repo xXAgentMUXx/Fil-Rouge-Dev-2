@@ -1,11 +1,20 @@
+<!DOCTYPE html>
+<html lang="fr">
+
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="../web/css/favorite.css">
-<title>Ajouter une propriété - Y-Plaza</title>
+<title>Mes Favoris - Y-Plaza</title>
 </head>
 
-<h1>Mes Favoris</h1>
+<body>
+
+<div class="container">
+
+<h1>⭐ Mes Favoris</h1>
+
+<div class="favorites-list">
 
 {{range .}}
 
@@ -13,9 +22,9 @@
 
 <h3>{{.Title}}</h3>
 
-<p>{{.City}}</p>
+<p class="city">{{.City}}</p>
 
-<p>{{.Price}} €</p>
+<p class="price">{{.Price}} €</p>
 
 <form action="/favorite/remove" method="POST">
 
@@ -28,3 +37,10 @@
 </div>
 
 {{end}}
+
+</div>
+
+</div>
+
+</body>
+</html>

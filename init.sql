@@ -3,7 +3,8 @@ CREATE EXTENSION IF NOT EXISTS pgcrypto;
 CREATE TABLE users (
     id SERIAL PRIMARY KEY,
     email VARCHAR(255) NOT NULL UNIQUE,
-    password TEXT NOT NULL,
+    password TEXT,
+    provider VARCHAR(20) NOT NULL DEFAULT 'local',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     role VARCHAR(20) NOT NULL DEFAULT 'client'
 );

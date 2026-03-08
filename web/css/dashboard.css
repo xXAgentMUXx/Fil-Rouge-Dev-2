@@ -1,49 +1,85 @@
+*{
+box-sizing:border-box;
+margin:0;
+padding:0;
+}
 body{
-
 font-family:system-ui, sans-serif;
 background:#f5f7fb;
-padding:40px;
-
+padding:20px;
+}
+.container{
+max-width:1200px;
+margin:auto;
+display:flex;
+flex-direction:column;
+gap:25px;
 }
 h1{
-margin-bottom:25px;
+margin-bottom:20px;
+font-size:28px;
+color:#111;
 }
 h2{
-margin-top:35px;
 margin-bottom:10px;
+margin-top:20px;
 color:#2563eb;
+font-size:22px;
 }
-p{
+.stats p, 
+.top-cities li, 
+.expensive-properties li, 
+.latest-properties li{
 background:white;
 padding:14px;
 border-radius:8px;
 box-shadow:0 5px 15px rgba(0,0,0,0.05);
 margin-bottom:10px;
 }
+
 ul{
 list-style:none;
 padding:0;
 }
-li{
-background:white;
-padding:12px;
-margin-bottom:8px;
-border-radius:6px;
-box-shadow:0 3px 10px rgba(0,0,0,0.05);
-}
-canvas{
+.chart-section{
 background:white;
 padding:20px;
 border-radius:10px;
-margin-top:15px
 box-shadow:0 8px 25px rgba(0,0,0,0.08);
+position:relative;
+height:300px;
 }
-@media (max-width:768px){
-body{
-padding:20px;
-}
+
 canvas{
 width:100% !important;
-height:auto !important;
+height:100% !important;
 }
+@media (max-width:375px){
+h1{font-size:24px;}
+h2{font-size:20px;}
+.chart-section{height:250px;}
+}
+@media (min-width:376px) and (max-width:425px){
+h1{font-size:25px;}
+h2{font-size:21px;}
+}
+
+@media (min-width:768px){
+.container{padding:20px;}
+.chart-section{height:350px;}
+}
+
+@media (min-width:1024px){
+.container{gap:30px;}
+.chart-section{height:400px;}
+}
+
+@media (min-width:1440px){
+.container{max-width:1400px;}
+chart-section{height:450px;}
+}
+
+@media (min-width:2560px){
+.container{max-width:1800px;}
+.chart-section{height:550px;}
 }

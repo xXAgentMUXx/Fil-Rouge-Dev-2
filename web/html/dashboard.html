@@ -1,81 +1,84 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Dashboard Admin</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="../web/css/dashboard.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
+<title>Dashboard Admin - Y-Plaza</title>
 </head>
-
 <body>
+
+<div class="container">
 
 <h1>📊 Dashboard Admin</h1>
 
+<section class="stats">
 <h2>Statistiques</h2>
-
 <p>Total des ventes : {{.TotalSales}} €</p>
 <p>Biens vendus : {{.TotalSold}}</p>
 <p>Total propriétés : {{.TotalProperties}}</p>
+</section>
 
+<section class="top-cities">
 <h2>🌍 Villes populaires</h2>
-
 <ul>
 {{range .TopCities}}
 <li>{{.City}} : {{.Total}} biens</li>
 {{end}}
 </ul>
+</section>
 
+<section class="chart-section">
 <h2>📈 Graphique des propriétés par ville</h2>
+<canvas id="citiesChart"></canvas>
+</section>
 
-<canvas id="citiesChart" width="400" height="200"></canvas>
-
+<section class="expensive-properties">
 <h2>💎 Biens les plus chers</h2>
-
 <ul>
 {{range .ExpensiveProperties}}
 <li>{{.Title}} - {{.City}} - {{.Price}} €</li>
 {{end}}
 </ul>
+</section>
 
+<section class="latest-properties">
 <h2>🆕 Dernières propriétés</h2>
-
 <ul>
 {{range .LatestProperties}}
 <li>{{.Title}} - {{.City}} - {{.Price}} €</li>
 {{end}}
 </ul>
+</section>
+
+</div>
 
 <script>
-
 const cities = [
-{{range .TopCities}}
-"{{.City}}",
-{{end}}
+{{range .TopCities}}"{{.City}}",{{end}}
 ];
 
 const totals = [
-{{range .TopCities}}
-{{.Total}},
-{{end}}
+{{range .TopCities}}{{.Total}},{{end}}
 ];
 
-const ctx = document.getElementById('citiesChart');
-
+const ctx = document.getElementById('citiesChart').getContext('2d');
 new Chart(ctx, {
     type: 'bar',
     data: {
         labels: cities,
         datasets: [{
             label: 'Nombre de propriétés',
-            data: totals
+            data: totals,
+            backgroundColor: '#2563eb'
         }]
     },
     options: {
-        responsive: true
+        responsive: true,
+        maintainAspectRatio: false
     }
 });
-
 </script>
 
 </body>
