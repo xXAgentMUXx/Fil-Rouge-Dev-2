@@ -16,17 +16,16 @@ max-width:1200px;
 margin:auto;
 }
 
-.top-bar{
-display:flex;
-flex-wrap:wrap;
-gap:10px;
-margin-bottom:20px;
-}
-
-.top-bar a{
+.back-btn{
+display:inline-block;
+margin-bottom:15px;
 text-decoration:none;
 color:#2563eb;
 font-weight:500;
+}
+
+.back-btn:hover{
+text-decoration:underline;
 }
 
 h1{

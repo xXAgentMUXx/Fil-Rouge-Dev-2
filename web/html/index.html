@@ -8,12 +8,12 @@
 </head>
 <body>
 
-<a href="/logout" class="logout">Déconnexion</a>
-<a href="/favorites">⭐ Mes favoris</a>
-<a href="/profile" class="profile-btn">Mon Profil</a>
+<a href="/logout" class="back-btn">Déconnexion</a>
+<a href="/favorites" class="back-btn">⭐ Mes favoris</a>
+<a href="/profile" class="back-btn">Mon Profil</a>
 
 {{if eq .UserRole "admin"}}
-<a href="/dashboard">📊 Dashboard</a>
+<a href="/dashboard" class="back-btn">📊 Dashboard</a>
 {{end}}
 
 <h1>Bienvenue sur Y-Plaza</h1>

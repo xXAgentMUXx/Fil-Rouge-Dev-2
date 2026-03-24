@@ -29,18 +29,16 @@ margin-bottom:10px;
 color:#2563eb;
 font-size:18px;
 }
-a{
+.back-btn{
+display:inline-block;
+margin-bottom:15px;
 text-decoration:none;
 color:#2563eb;
 font-weight:500;
 }
 
-a:hover{
+.back-btn:hover{
 text-decoration:underline;
-}
-.back-btn{
-display:inline-block;
-margin-bottom:15px;
 }
 .profile-section p{
 margin-bottom:8px;

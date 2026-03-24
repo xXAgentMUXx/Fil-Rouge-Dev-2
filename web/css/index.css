@@ -1,6 +1,5 @@
 :root{
 
-/* Colors */
 --primary:#2563eb;
 --primary-dark:#1e40af;
 --accent:#22c55e;
@@ -34,6 +33,18 @@ padding:30px;
 max-width:1200px;
 margin:auto;
 }
+
+.back-btn{
+display:inline-block;
+text-decoration:none;
+color:#2563eb;
+font-weight:500;
+}
+
+.back-btn:hover{
+text-decoration:underline;
+}
+
 .navbar{
 position:sticky;
 top:0;

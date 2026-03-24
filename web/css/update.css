@@ -34,6 +34,18 @@ display:block;
 margin-bottom:6px;
 }
 
+.back-btn{
+display:inline-block;
+margin-bottom:15px;
+text-decoration:none;
+color:#2563eb;
+font-weight:500;
+}
+
+.back-btn:hover{
+text-decoration:underline;
+}
+
 input{
 width:100%;
 padding:12px;
