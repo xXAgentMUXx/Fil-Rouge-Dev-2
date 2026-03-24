@@ -19,74 +19,52 @@ type ProfileData struct {
 
 func (h *UserHandler) ProfilePage(w http.ResponseWriter, r *http.Request) {
 
-	cookie, err := r.Cookie("session")
+	user, err := GetCurrentUser(r)
 	if err != nil {
 		http.Redirect(w, r, "/login", http.StatusSeeOther)
 		return
 	}
 
-	var email string
-	var role string
-	var provider string
-
-	err = DB.QueryRow(
-		"SELECT email, role, provider FROM users WHERE email=$1",
-		cookie.Value,
-	).Scan(&email, &role, &provider)
-
-	if err != nil {
-		http.Error(w, "Utilisateur introuvable", 500)
-		return
-	}
-
-	rowsBuy, err := DB.Query(`
+	rowsBuy, _ := DB.Query(`
 		SELECT p.title
 		FROM payments pay
 		JOIN properties p ON p.id = pay.property_id
-		WHERE pay.buyer_id = (
-			SELECT id FROM users WHERE email=$1
-		) AND pay.status='paid'
-	`, email)
+		WHERE pay.buyer_id = $1 AND pay.status='paid'
+	`, user.ID)
 
 	var purchases []string
-
-	if err == nil {
+	if rowsBuy != nil {
 		defer rowsBuy.Close()
 		for rowsBuy.Next() {
 			var title string
-			if err := rowsBuy.Scan(&title); err == nil {
-				purchases = append(purchases, title)
-			}
+			rowsBuy.Scan(&title)
+			purchases = append(purchases, title)
 		}
 	}
 
-	rowsSell, err := DB.Query(`
+	rowsSell, _ := DB.Query(`
 		SELECT p.title
 		FROM sales s
 		JOIN properties p ON p.id = s.property_id
-		WHERE s.agent_id = (
-			SELECT id FROM users WHERE email=$1
-		)
-	`, email)
+		WHERE s.agent_id = $1
+	`, user.ID)
 
 	var sales []string
-
-	if err == nil {
+	if rowsSell != nil {
 		defer rowsSell.Close()
 		for rowsSell.Next() {
 			var title string
-			if err := rowsSell.Scan(&title); err == nil {
-				sales = append(sales, title)
-			}
+			rowsSell.Scan(&title)
+			sales = append(sales, title)
 		}
 	}
 
 	data := ProfileData{
-	Email: email,
-	Role: role,
-	Provider: provider,
-	Purchases: purchases,
-	Sales: sales,
+		Email:     user.Email,
+		Role:      user.Role,
+		Provider:  user.Provider,
+		Purchases: purchases,
+		Sales:     sales,
 	}
 
 	tmpl := template.Must(template.ParseFiles("web/html/profile.html"))
@@ -100,7 +78,7 @@ func (h *UserHandler) UpdateAccount(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cookie, err := r.Cookie("session")
+	user, err := GetCurrentUser(r)
 	if err != nil {
 		http.Redirect(w, r, "/login", http.StatusSeeOther)
 		return
@@ -109,40 +87,25 @@ func (h *UserHandler) UpdateAccount(w http.ResponseWriter, r *http.Request) {
 	newEmail := r.FormValue("email")
 	newPassword := r.FormValue("password")
 
-	var provider string
-
-	err = DB.QueryRow(
-		"SELECT provider FROM users WHERE email=$1",
-		cookie.Value,
-	).Scan(&provider)
-
-	if err != nil {
-		http.Error(w, "Utilisateur introuvable", 500)
-		return
-	}
-
 	hash, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.DefaultCost)
 	if err != nil {
 		http.Error(w, "Erreur hash password", 500)
 		return
 	}
 
-	if provider != "local" {
-
+	if user.Provider != "local" {
 		_, err = DB.Exec(
-			"UPDATE users SET email=$1, password=$2, provider='local' WHERE email=$3",
+			"UPDATE users SET email=$1, password=$2, provider='local' WHERE id=$3",
 			newEmail,
 			string(hash),
-			cookie.Value,
+			user.ID,
 		)
-
 	} else {
-
 		_, err = DB.Exec(
-			"UPDATE users SET email=$1, password=$2 WHERE email=$3",
+			"UPDATE users SET email=$1, password=$2 WHERE id=$3",
 			newEmail,
 			string(hash),
-			cookie.Value,
+			user.ID,
 		)
 	}
 
@@ -159,7 +122,6 @@ func (h *UserHandler) UpdateAccount(w http.ResponseWriter, r *http.Request) {
 
 	http.Redirect(w, r, "/profile", http.StatusSeeOther)
 }
-
 func (h *UserHandler) UpdatePage(w http.ResponseWriter, r *http.Request) {
 
 	cookie, err := r.Cookie("session")

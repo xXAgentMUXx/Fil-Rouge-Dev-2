@@ -11,6 +11,7 @@ import (
 	"strconv"
 	"io"
 	"os"
+	"time"
 
 	_ "github.com/lib/pq"
 
@@ -52,26 +53,12 @@ func InitDB() {
 func (h *PropertyHandler) Mainpage(w http.ResponseWriter, r *http.Request) {
 	properties, err := h.Service.ListProperties()
 	if err != nil {
-		http.Error(w, "Erreur lors de la récupération des propriétés", http.StatusInternalServerError)
+		http.Error(w, "Erreur récupération propriétés", 500)
 		return
 	}
-	cookie, err := r.Cookie("session")
+	_, role, err := GetUserFromSession(r)
 	if err != nil {
 		http.Redirect(w, r, "/login", http.StatusSeeOther)
-		return
-	}
-	var role string
-	err = DB.QueryRow(
-		"SELECT role FROM users WHERE email = $1",
-		cookie.Value,
-	).Scan(&role)
-	if err == sql.ErrNoRows {
-	http.Redirect(w, r, "/login", http.StatusSeeOther)
-	return
-	}
-	if err != nil {
-		log.Println("Erreur récupération rôle:", err)
-		http.Error(w, "Erreur serveur", http.StatusInternalServerError)
 		return
 	}
 	data := PropertyPageData{
@@ -79,7 +66,10 @@ func (h *PropertyHandler) Mainpage(w http.ResponseWriter, r *http.Request) {
 		UserRole:   role,
 	}
 	tmpl := template.Must(template.ParseFiles("web/html/index.html"))
-	tmpl.Execute(w, data)
+	err = tmpl.Execute(w, data)
+	if err != nil {
+		http.Error(w, "Erreur affichage", 500)
+	}
 }
 
 func GetLogin(w http.ResponseWriter, r *http.Request){
@@ -111,6 +101,7 @@ func PostLogin(w http.ResponseWriter, r *http.Request) {
 		Value:    email,
 		HttpOnly: true,
 		Path:     "/",
+		Secure:   false,
 	}
 
 	http.SetCookie(w, &cookie)
@@ -156,6 +147,7 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 		Value:  "",
 		MaxAge: -1,
 		Path:   "/",
+		Secure:   false,
 	}
 	http.SetCookie(w, &cookie)
 	http.Redirect(w, r, "/login", http.StatusSeeOther)
@@ -176,42 +168,50 @@ func RequireAuth(next http.HandlerFunc) http.HandlerFunc {
 func RequireRoles(roles ...string) func(http.HandlerFunc) http.HandlerFunc {
 	return func(next http.HandlerFunc) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
-			cookie, err := r.Cookie("session")
+			_, role, err := GetUserFromSession(r)
 			if err != nil {
 				http.Redirect(w, r, "/login", http.StatusSeeOther)
 				return
 			}
-
-			var role string
-			err = DB.QueryRow(
-				"SELECT role FROM users WHERE email = $1",
-				cookie.Value,
-			).Scan(&role)
-			if err != nil {
-				http.Error(w, "Accès interdit", http.StatusForbidden)
-				return
-			}
-
 			for _, allowed := range roles {
 				if role == allowed {
 					next(w, r)
 					return
 				}
 			}
-
 			http.Error(w, "Accès interdit", http.StatusForbidden)
 		}
 	}
 }
+
+func GetUserFromSession(r *http.Request) (int, string, error) {
+	cookie, err := r.Cookie("session")
+	if err != nil {
+		return 0, "", err
+	}
+
+	var id int
+	var role string
+
+	err = DB.QueryRow(
+		"SELECT id, role FROM users WHERE email=$1",
+		cookie.Value,
+	).Scan(&id, &role)
+
+	return id, role, err
+}
+
 type PropertyHandler struct {
 	Service *services.PropertyService
 }
 
 func (h *PropertyHandler) ListProperties(w http.ResponseWriter, r *http.Request) {
+
 	query := r.URL.Query()
 	filter := models.PropertyFilter{
 		City: query.Get("city"),
 	}
+
 	if v := query.Get("min_price"); v != "" {
 		if f, err := strconv.ParseFloat(v, 64); err == nil {
 			filter.MinPrice = &f
@@ -227,37 +227,29 @@ func (h *PropertyHandler) ListProperties(w http.ResponseWriter, r *http.Request)
 			filter.MinSurface = &i
 		}
 	}
+
 	properties, err := h.Service.Search(filter)
 	if err != nil {
-		http.Error(w, "Erreur serveur", http.StatusInternalServerError)
+		http.Error(w, "Erreur serveur", 500)
 		return
 	}
-	cookie, err := r.Cookie("session")
+
+	_, role, err := GetUserFromSession(r)
 	if err != nil {
 		http.Redirect(w, r, "/login", http.StatusSeeOther)
 		return
 	}
 
-	var role string
-	err = DB.QueryRow(
-		"SELECT role FROM users WHERE email = $1",
-		cookie.Value,
-	).Scan(&role)
-	if err == sql.ErrNoRows {
-	http.Redirect(w, r, "/login", http.StatusSeeOther)
-	return
-	}
-	if err != nil {
-		log.Println("Erreur récupération rôle:", err)
-		http.Error(w, "Erreur serveur", http.StatusInternalServerError)
-		return
-	}
 	data := PropertyPageData{
 		Properties: properties,
 		UserRole:   role,
 	}
+
 	tmpl := template.Must(template.ParseFiles("web/html/index.html"))
-	tmpl.Execute(w, data)
+	err = tmpl.Execute(w, data)
+	if err != nil {
+		http.Error(w, "Erreur affichage", 500)
+	}
 }
 
 func (h *PropertyHandler) AddProperty(w http.ResponseWriter, r *http.Request) {
@@ -303,10 +295,6 @@ func (h *PropertyHandler) AddProperty(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Surface invalide", http.StatusBadRequest)
 			return
 		}
-
-		// -------------------------------
-		// Upload image (optionnel)
-		// -------------------------------
 
 		var imagePath string
 
@@ -373,7 +361,10 @@ func (h *PropertyHandler) AddProperty(w http.ResponseWriter, r *http.Request) {
 	}
 
 	tmpl := template.Must(template.ParseFiles("web/html/add_property.html"))
-	tmpl.Execute(w, agencies)
+	err = tmpl.Execute(w, agencies)
+	if err != nil {
+		http.Error(w, "Erreur affichage", 500)
+	}
 }
 
 type SaleHandler struct {
@@ -385,8 +376,6 @@ func (h *SaleHandler) Sell(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Méthode non autorisée", http.StatusMethodNotAllowed)
 		return
 	}
-
-	// --- Conversion des IDs ---
 	propertyIDStr := r.FormValue("property_id")
 	buyerIDStr := r.FormValue("buyer_id")
 	priceStr := r.FormValue("sale_price")
@@ -523,7 +512,10 @@ func SoldPage(w http.ResponseWriter, r *http.Request) {
 		Price:      price,
 	}
 	tmpl := template.Must(template.ParseFiles("web/html/sold.html"))
-	tmpl.Execute(w, data)
+	err := tmpl.Execute(w, data)
+	if err != nil {
+		http.Error(w, "Erreur affichage", 500)
+	}
 }
 func PaymentSuccess(w http.ResponseWriter, r *http.Request) {
 	sessionID := r.URL.Query().Get("session_id")
@@ -540,36 +532,51 @@ func PaymentSuccess(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		log.Println("Paiement introuvable:", err)
-		http.Error(w, "Paiement introuvable", 500)
+		http.Error(w, "Paiement introuvable", http.StatusInternalServerError)
 		return
 	}
-	_, err = DB.Exec(
+	tx, err := DB.Begin()
+	if err != nil {
+		log.Println("Erreur début transaction:", err)
+		http.Error(w, "Erreur serveur", 500)
+		return
+	}
+	_, err = tx.Exec(
 		"UPDATE payments SET status='paid' WHERE stripe_session_id=$1",
 		sessionID,
 	)
-
 	if err != nil {
+		tx.Rollback()
 		log.Println("Erreur update paiement:", err)
 		http.Error(w, "Erreur paiement", 500)
 		return
 	}
-	_, err = DB.Exec(
+	_, err = tx.Exec(
 		"UPDATE properties SET is_sold=true WHERE id=$1",
 		propertyID,
 	)
-
 	if err != nil {
+		tx.Rollback()
 		log.Println("Erreur update propriété:", err)
 		http.Error(w, "Erreur propriété", 500)
 		return
 	}
+	err = tx.Commit()
+	if err != nil {
+		log.Println("Erreur commit:", err)
+		http.Error(w, "Erreur serveur", 500)
+		return
+	}
 	http.Redirect(w, r, "/properties", http.StatusSeeOther)
 }
-
 func (h *PropertyHandler) EditProperty(w http.ResponseWriter, r *http.Request) {
 
 	idStr := r.URL.Query().Get("id")
-	id, _ := strconv.Atoi(idStr)
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		http.Error(w, "ID invalide", 400)
+		return
+	}
 
 	property, err := h.Service.GetProperty(id)
 
@@ -579,47 +586,84 @@ func (h *PropertyHandler) EditProperty(w http.ResponseWriter, r *http.Request) {
 	}
 
 	tmpl := template.Must(template.ParseFiles("web/html/edit_property.html"))
-	tmpl.Execute(w, property)
+	err = tmpl.Execute(w, property)
+	if err != nil {
+		http.Error(w, "Erreur affichage", 500)
+	}
 }
 
 func (h *PropertyHandler) UpdateProperty(w http.ResponseWriter, r *http.Request) {
+
 	err := r.ParseMultipartForm(10 << 20)
 	if err != nil {
 		http.Error(w, "Erreur formulaire", http.StatusBadRequest)
 		return
 	}
-
-	id, _ := strconv.Atoi(r.FormValue("id"))
+	id, err := strconv.Atoi(r.FormValue("id"))
+	if err != nil {
+		http.Error(w, "ID invalide", http.StatusBadRequest)
+		return
+	}
 	title := r.FormValue("title")
 	description := r.FormValue("description")
 	city := r.FormValue("city")
 
+	if title == "" || city == "" {
+		http.Error(w, "Champs requis manquants", 400)
+	return
+	}
+
+	price, err := strconv.ParseFloat(r.FormValue("price"), 64)
+	if err != nil {
+		http.Error(w, "Prix invalide", http.StatusBadRequest)
+		return
+	}
+
+	surface, err := strconv.Atoi(r.FormValue("surface"))
+	if err != nil {
+		http.Error(w, "Surface invalide", http.StatusBadRequest)
+		return
+	}
+
+	agencyID := r.FormValue("agency_id")
+	if agencyID == "" {
+		http.Error(w, "Agence invalide", http.StatusBadRequest)
+		return
+	}
 	file, handler, err := r.FormFile("image")
 
 	var filename string
 
 	if err == nil {
-		defer file.Close()
+	defer file.Close()
 
-		filename = handler.Filename
-		path := "web/uploads/" + filename
+	filename = fmt.Sprintf("%d_%s", time.Now().Unix(), handler.Filename)
+	path := "web/uploads/" + filename
 
-		dst, err := os.Create(path)
-		if err != nil {
-			http.Error(w, "Erreur upload", http.StatusInternalServerError)
-			return
-		}
-		defer dst.Close()
+	dst, err := os.Create(path)
+	if err != nil {
+		http.Error(w, "Erreur upload", http.StatusInternalServerError)
+		return
+	}
+	defer dst.Close()
 
-		io.Copy(dst, file)
+	_, err = io.Copy(dst, file)
+	if err != nil {
+		http.Error(w, "Erreur copie fichier", http.StatusInternalServerError)
+		return
 	}
 
+	filename = "/uploads/" + filename 
+	}
 	property := models.Property{
-	ID:          id,
-	Title:       title,
-	Description: description,
-	City:        city,
-	Image:       filename,
+		ID:          id,
+		Title:       title,
+		Description: description,
+		City:        city,
+		Price:       price,
+		Surface:     surface,
+		AgencyID:    agencyID,
+		Image:       filename,
 	}
 
 	err = h.Service.UpdateProperty(property)
@@ -684,7 +728,10 @@ func (h *PropertyHandler) Dashboard(w http.ResponseWriter, r *http.Request) {
 	}
 
 	tmpl := template.Must(template.ParseFiles("web/html/dashboard.html"))
-	tmpl.Execute(w, data)
+	err := tmpl.Execute(w, data)
+	if err != nil {
+		http.Error(w, "Erreur affichage", 500)
+	}
 }
 
 func (h *PropertyHandler) PropertyDetail(w http.ResponseWriter, r *http.Request) {
@@ -701,5 +748,8 @@ func (h *PropertyHandler) PropertyDetail(w http.ResponseWriter, r *http.Request)
 		return
 	}
 	tmpl := template.Must(template.ParseFiles("web/html/property_detail.html"))
-	tmpl.Execute(w, property)
+	err = tmpl.Execute(w, property)
+	if err != nil {
+		http.Error(w, "Erreur affichage", 500)
+	}
 }

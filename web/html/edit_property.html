@@ -29,6 +29,13 @@
 <label>Surface</label>
 <input type="number" name="surface" value="{{.Surface}}" required>
 
+<label>Agence</label>
+<select name="agency_id" required>
+	<option value="{{.AgencyID}}">Agence actuelle ({{.AgencyID}})</option>
+	<option value="1">Agence 1</option>
+	<option value="2">Agence 2</option>
+</select>
+
 <label>Image</label>
 <input type="file" name="image">
 

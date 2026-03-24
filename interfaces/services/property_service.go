@@ -39,6 +39,9 @@ func (s *PropertyService) UpdateProperty(property models.Property) error {
 		property.Title,
 		property.Description,
 		property.City,
+		property.Price,
+		property.Surface,
+		property.AgencyID,
 		property.Image,
 	)
 }

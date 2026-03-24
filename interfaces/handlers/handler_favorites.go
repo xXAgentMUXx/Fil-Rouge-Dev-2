@@ -14,19 +14,15 @@ type FavoriteHandler struct {
 
 func (h *FavoriteHandler) AddFavorite(w http.ResponseWriter, r *http.Request) {
 
+	user, err := GetCurrentUser(r)
+	if err != nil {
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
+	}
+
 	propertyID, _ := strconv.Atoi(r.FormValue("property_id"))
 
-	cookie, _ := r.Cookie("session")
-
-	var userID int
-
-	DB.QueryRow(
-		"SELECT id FROM users WHERE email=$1",
-		cookie.Value,
-	).Scan(&userID)
-
-	err := h.Service.AddFavorite(userID, propertyID)
-
+	err = h.Service.AddFavorite(user.ID, propertyID)
 	if err != nil {
 		http.Error(w, "Erreur favoris", 500)
 		return
@@ -37,41 +33,43 @@ func (h *FavoriteHandler) AddFavorite(w http.ResponseWriter, r *http.Request) {
 
 func (h *FavoriteHandler) RemoveFavorite(w http.ResponseWriter, r *http.Request) {
 
-	propertyID, _ := strconv.Atoi(r.FormValue("property_id"))
+	user, err := GetCurrentUser(r)
+	if err != nil {
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
+	}
 
-	cookie, _ := r.Cookie("session")
+	propertyID, err := strconv.Atoi(r.FormValue("property_id"))
+	if err != nil {
+		http.Error(w, "ID propriété invalide", http.StatusBadRequest)
+		return
+	}
 
-	var userID int
-
-	DB.QueryRow(
-		"SELECT id FROM users WHERE email=$1",
-		cookie.Value,
-	).Scan(&userID)
-
-	h.Service.RemoveFavorite(userID, propertyID)
+	err = h.Service.RemoveFavorite(user.ID, propertyID)
+	if err != nil {
+		http.Error(w, "Erreur suppression favori", 500)
+		return
+	}
 
 	http.Redirect(w, r, "/favorites", http.StatusSeeOther)
 }
-
 func (h *FavoriteHandler) FavoritesPage(w http.ResponseWriter, r *http.Request) {
 
-	cookie, _ := r.Cookie("session")
+	user, err := GetCurrentUser(r)
+	if err != nil {
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
+	}
 
-	var userID int
-
-	DB.QueryRow(
-		"SELECT id FROM users WHERE email=$1",
-		cookie.Value,
-	).Scan(&userID)
-
-	properties, err := h.Service.GetFavorites(userID)
-
+	properties, err := h.Service.GetFavorites(user.ID)
 	if err != nil {
 		http.Error(w, "Erreur favoris", 500)
 		return
 	}
 
 	tmpl := template.Must(template.ParseFiles("web/html/favorites.html"))
-
-	tmpl.Execute(w, properties)
+	err = tmpl.Execute(w, properties)
+	if err != nil {
+		http.Error(w, "Erreur affichage", 500)
+	}
 }

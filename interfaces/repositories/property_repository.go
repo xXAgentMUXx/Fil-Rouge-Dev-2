@@ -3,7 +3,7 @@ package repositories
 import (
 	"database/sql"
 	"filrouge/interfaces/models"
-	"strings"
+	"strconv"
 )
 
 type PropertyRepository struct {
@@ -63,6 +63,7 @@ func (r *PropertyRepository) FindWithFilters(filter models.PropertyFilter) ([]mo
 	SELECT id, title, description, city, price, surface, agency_id, image, is_sold, created_at
 	FROM properties
 	WHERE 1=1
+	AND is_sold = false
 	`
 	args := []interface{}{}
 	argID := 1
@@ -122,27 +123,26 @@ func (r *PropertyRepository) FindWithFilters(filter models.PropertyFilter) ([]mo
 }
 
 func itoa(i int) string {
-	return strings.TrimSpace(string(rune('0' + i)))
+	return strconv.Itoa(i)
 }
 
-func (r *PropertyRepository) Update(id int, title, description, city, image string) error {
+func (r *PropertyRepository) Update(id int, title string, description string, city string, price float64, surface int, agencyID string, image string) error {
 
 	if image != "" {
 
 		_, err := r.DB.Exec(`
 		UPDATE properties
-		SET title=$1, description=$2, city=$3, image=$4
-		WHERE id=$5`,
-			title, description, city, image, id)
+		SET title=$1, description=$2, city=$3, price=$4, surface=$5, agency_id=$6, image=$7
+		WHERE id=$8`,
+			title, description, city, price, surface, agencyID, image, id)
 
 		return err
 	}
-
 	_, err := r.DB.Exec(`
 	UPDATE properties
-	SET title=$1, description=$2, city=$3
-	WHERE id=$4`,
-		title, description, city, id)
+	SET title=$1, description=$2, city=$3, price=$4, surface=$5, agency_id=$6
+	WHERE id=$7`,
+		title, description, city, price, surface, agencyID, id)
 
 	return err
 }
@@ -225,7 +225,10 @@ func (r *PropertyRepository) GetTopCities() ([]models.CityStats, error) {
 
 	for rows.Next() {
 		var c models.CityStats
-		rows.Scan(&c.City, &c.Total)
+		err := rows.Scan(&c.City, &c.Total)
+		if err != nil {
+			return nil, err
+		}
 		cities = append(cities, c)
 	}
 
@@ -249,7 +252,10 @@ func (r *PropertyRepository) GetMostExpensive() ([]models.Property, error) {
 
 	for rows.Next() {
 		var p models.Property
-		rows.Scan(&p.ID, &p.Title, &p.City, &p.Price)
+		err := rows.Scan(&p.ID, &p.Title, &p.City, &p.Price)
+		if err != nil {
+			return nil, err
+		}
 		properties = append(properties, p)
 	}
 
@@ -284,7 +290,10 @@ func (r *PropertyRepository) GetLatestProperties() ([]models.Property, error) {
 
 	for rows.Next() {
 		var p models.Property
-		rows.Scan(&p.ID, &p.Title, &p.City, &p.Price)
+		err := rows.Scan(&p.ID, &p.Title, &p.City, &p.Price)
+		if err != nil {
+			return nil, err
+		}
 		properties = append(properties, p)
 	}
 
