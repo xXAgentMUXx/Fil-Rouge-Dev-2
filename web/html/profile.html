@@ -27,13 +27,17 @@
 
 <p>Connecter votre compte :</p>
 
-<a href="/auth/google">
-<button>Connecter Google</button>
-</a>
+<div class="oauth">
+    <a href="/auth/google" class="oauth-btn google">
+        <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="google">
+        Connecter Google
+    </a>
 
-<a href="/auth/github">
-<button>Connecter GitHub</button>
-</a>
+    <a href="/auth/github" class="oauth-btn github">
+        <img src="https://www.svgrepo.com/show/512317/github-142.svg" alt="github">
+        Connecter GitHub
+    </a>
+</div>
 
 {{ end }}
 

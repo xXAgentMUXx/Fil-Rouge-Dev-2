@@ -97,12 +97,10 @@ func main() {
 
 	provider := parts[2]
 
-	// injecte dans la query (ce que goth attend)
 	q := r.URL.Query()
 	q.Add("provider", provider)
 	r.URL.RawQuery = q.Encode()
 
-	// callback ou begin
 	if strings.Contains(r.URL.Path, "/callback") {
 		web.CallbackAuth(w, r)
 		return
