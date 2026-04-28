@@ -68,9 +68,7 @@ func (r *FavoriteRepository) GetByUser(userID int) ([]models.Property, error) {
 		if err != nil {
 			return nil, err
 		}
-
 		properties = append(properties, p)
 	}
-
 	return properties, nil
 }

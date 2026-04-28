@@ -24,7 +24,6 @@ func (h *UserHandler) ProfilePage(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/login", http.StatusSeeOther)
 		return
 	}
-
 	rowsBuy, _ := DB.Query(`
 		SELECT p.title
 		FROM payments pay
@@ -41,12 +40,11 @@ func (h *UserHandler) ProfilePage(w http.ResponseWriter, r *http.Request) {
 			purchases = append(purchases, title)
 		}
 	}
-
 	rowsSell, _ := DB.Query(`
 		SELECT p.title
 		FROM sales s
 		JOIN properties p ON p.id = s.property_id
-		WHERE s.agent_id = $1
+		WHERE p.agent_id = $1
 	`, user.ID)
 
 	var sales []string
@@ -58,7 +56,6 @@ func (h *UserHandler) ProfilePage(w http.ResponseWriter, r *http.Request) {
 			sales = append(sales, title)
 		}
 	}
-
 	data := ProfileData{
 		Email:     user.Email,
 		Role:      user.Role,
@@ -66,7 +63,6 @@ func (h *UserHandler) ProfilePage(w http.ResponseWriter, r *http.Request) {
 		Purchases: purchases,
 		Sales:     sales,
 	}
-
 	tmpl := template.Must(template.ParseFiles("web/html/profile.html"))
 	tmpl.Execute(w, data)
 }
@@ -77,13 +73,11 @@ func (h *UserHandler) UpdateAccount(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/profile", http.StatusSeeOther)
 		return
 	}
-
 	user, err := GetCurrentUser(r)
 	if err != nil {
 		http.Redirect(w, r, "/login", http.StatusSeeOther)
 		return
 	}
-
 	newEmail := r.FormValue("email")
 	newPassword := r.FormValue("password")
 
@@ -92,7 +86,6 @@ func (h *UserHandler) UpdateAccount(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Erreur hash password", 500)
 		return
 	}
-
 	if user.Provider != "local" {
 		_, err = DB.Exec(
 			"UPDATE users SET email=$1, password=$2, provider='local' WHERE id=$3",
@@ -108,30 +101,25 @@ func (h *UserHandler) UpdateAccount(w http.ResponseWriter, r *http.Request) {
 			user.ID,
 		)
 	}
-
 	if err != nil {
 		http.Error(w, "Erreur mise à jour compte", 500)
 		return
 	}
-
 	http.SetCookie(w, &http.Cookie{
 		Name:  "session",
 		Value: newEmail,
 		Path:  "/",
 	})
-
 	http.Redirect(w, r, "/profile", http.StatusSeeOther)
 }
-func (h *UserHandler) UpdatePage(w http.ResponseWriter, r *http.Request) {
 
+func (h *UserHandler) UpdatePage(w http.ResponseWriter, r *http.Request) {
 	cookie, err := r.Cookie("session")
 	if err != nil {
 		http.Redirect(w, r, "/login", http.StatusSeeOther)
 		return
 	}
-
 	var provider string
-
 	err = DB.QueryRow(
 		"SELECT provider FROM users WHERE email=$1",
 		cookie.Value,
@@ -141,13 +129,11 @@ func (h *UserHandler) UpdatePage(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Utilisateur introuvable", 500)
 		return
 	}
-
 	data := struct {
 		Provider string
 	}{
 		Provider: provider,
 	}
-
 	tmpl := template.Must(template.ParseFiles("web/html/update.html"))
 	tmpl.Execute(w, data)
 }

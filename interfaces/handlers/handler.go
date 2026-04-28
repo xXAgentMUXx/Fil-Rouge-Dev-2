@@ -42,11 +42,9 @@ func InitDB() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	if err = DB.Ping(); err != nil {
 		log.Fatal(err)
 	}
-
 	log.Println("Connected to database")
 }
 
@@ -103,9 +101,7 @@ func PostLogin(w http.ResponseWriter, r *http.Request) {
 		Path:     "/",
 		Secure:   false,
 	}
-
 	http.SetCookie(w, &cookie)
-
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
@@ -118,7 +114,6 @@ func PostRegister(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/register", http.StatusSeeOther)
 		return
 	}
-
 	email := r.FormValue("email")
 	password := r.FormValue("password")
 
@@ -131,13 +126,11 @@ func PostRegister(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Erreur serveur", http.StatusInternalServerError)
 		return
 	}
-
 	_, err = DB.Exec("INSERT INTO users(email, password) VALUES($1, $2)", email, string(hashedPassword))
 	if err != nil {
 		http.Error(w, "Email déjà utilisé", http.StatusBadRequest)
 		return
 	}
-
 	http.Redirect(w, r, "/login", http.StatusSeeOther)
 }
 
@@ -227,24 +220,20 @@ func (h *PropertyHandler) ListProperties(w http.ResponseWriter, r *http.Request)
 			filter.MinSurface = &i
 		}
 	}
-
 	properties, err := h.Service.Search(filter)
 	if err != nil {
 		http.Error(w, "Erreur serveur", 500)
 		return
 	}
-
 	_, role, err := GetUserFromSession(r)
 	if err != nil {
 		http.Redirect(w, r, "/login", http.StatusSeeOther)
 		return
 	}
-
 	data := PropertyPageData{
 		Properties: properties,
 		UserRole:   role,
 	}
-
 	tmpl := template.Must(template.ParseFiles("web/html/index.html"))
 	err = tmpl.Execute(w, data)
 	if err != nil {
@@ -267,13 +256,11 @@ func (h *PropertyHandler) AddProperty(w http.ResponseWriter, r *http.Request) {
 			"SELECT EXISTS (SELECT 1 FROM agencies WHERE id = $1)",
 			agencyID,
 		).Scan(&agencyExists)
-
 		if err != nil || !agencyExists {
 			log.Println("L'agence avec l'ID", agencyID, "n'existe pas.")
 			http.Error(w, "L'agence spécifiée n'existe pas.", http.StatusBadRequest)
 			return
 		}
-
 		cookie, _ := r.Cookie("session")
 
 		var agentID int
@@ -288,14 +275,12 @@ func (h *PropertyHandler) AddProperty(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Prix invalide", http.StatusBadRequest)
 			return
 		}
-
 		surface, err := strconv.Atoi(surfaceStr)
 		if err != nil {
 			log.Println("Erreur conversion surface:", err)
 			http.Error(w, "Surface invalide", http.StatusBadRequest)
 			return
 		}
-
 		var imagePath string
 
 		file, handler, err := r.FormFile("image")
@@ -315,7 +300,6 @@ func (h *PropertyHandler) AddProperty(w http.ResponseWriter, r *http.Request) {
 				}
 			}
 		}
-
 		property := models.Property{
 			Title:       title,
 			Description: description,
@@ -326,18 +310,15 @@ func (h *PropertyHandler) AddProperty(w http.ResponseWriter, r *http.Request) {
 			AgentID:     agentID,
 			Image:       imagePath,
 		}
-
 		err = h.Service.AddProperty(property)
 		if err != nil {
 			log.Println("Erreur ajout propriété:", err)
 			http.Error(w, "Erreur serveur", http.StatusInternalServerError)
 			return
 		}
-
 		http.Redirect(w, r, "/properties", http.StatusSeeOther)
 		return
 	}
-
 	rows, err := DB.Query("SELECT id, name FROM agencies")
 	if err != nil {
 		log.Println("Erreur lors de la récupération des agences:", err)
@@ -356,10 +337,8 @@ func (h *PropertyHandler) AddProperty(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Erreur serveur", http.StatusInternalServerError)
 			return
 		}
-
 		agencies = append(agencies, agency)
 	}
-
 	tmpl := template.Must(template.ParseFiles("web/html/add_property.html"))
 	err = tmpl.Execute(w, agencies)
 	if err != nil {
@@ -385,13 +364,11 @@ func (h *SaleHandler) Sell(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "ID de propriété invalide", http.StatusBadRequest)
 		return
 	}
-
 	buyerID, err := strconv.Atoi(buyerIDStr)
 	if err != nil {
 		http.Error(w, "ID acheteur invalide", http.StatusBadRequest)
 		return
 	}
-
 	price, err := strconv.ParseFloat(priceStr, 64)
 	if err != nil || price <= 0 {
 		http.Error(w, "Prix invalide", http.StatusBadRequest)

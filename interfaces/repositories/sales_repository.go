@@ -32,7 +32,6 @@ func (r *SaleRepository) Create(sale models.Sale) error {
 		tx.Rollback()
 		return errors.New("property already sold")
 	}
-
 	_, err = tx.Exec(`
 		INSERT INTO sales (property_id, buyer_id, sale_price)
 		VALUES ($1, $2, $3)

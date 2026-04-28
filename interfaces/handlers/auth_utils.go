@@ -30,10 +30,8 @@ func GetCurrentUser(r *http.Request) (*User, error) {
 		&user.Role,
 		&user.Provider,
 	)
-
 	if err != nil {
 		return nil, err
 	}
-
 	return &user, nil
 }
