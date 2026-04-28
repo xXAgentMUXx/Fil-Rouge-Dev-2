@@ -54,6 +54,10 @@ func (h *PropertyHandler) Mainpage(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Erreur récupération propriétés", 500)
 		return
 	}
+	loc, _ := time.LoadLocation("Europe/Paris")
+	for i := range properties {
+		properties[i].CreatedAt = properties[i].CreatedAt.In(loc)
+	}
 	_, role, err := GetUserFromSession(r)
 	if err != nil {
 		http.Redirect(w, r, "/login", http.StatusSeeOther)
@@ -225,6 +229,10 @@ func (h *PropertyHandler) ListProperties(w http.ResponseWriter, r *http.Request)
 		http.Error(w, "Erreur serveur", 500)
 		return
 	}
+	loc, _ := time.LoadLocation("Europe/Paris")
+    for i := range properties {
+    properties[i].CreatedAt = properties[i].CreatedAt.In(loc)
+    }
 	_, role, err := GetUserFromSession(r)
 	if err != nil {
 		http.Redirect(w, r, "/login", http.StatusSeeOther)
@@ -299,6 +307,9 @@ func (h *PropertyHandler) AddProperty(w http.ResponseWriter, r *http.Request) {
 					imagePath = "/uploads/" + handler.Filename
 				}
 			}
+		}
+		if imagePath == "" {
+			imagePath = "/uploads/téléchargement.jpg"
 		}
 		property := models.Property{
 			Title:       title,
@@ -724,6 +735,8 @@ func (h *PropertyHandler) PropertyDetail(w http.ResponseWriter, r *http.Request)
 		http.Error(w, "Propriété introuvable", http.StatusNotFound)
 		return
 	}
+	loc, _ := time.LoadLocation("Europe/Paris")
+	property.CreatedAt = property.CreatedAt.In(loc)
 	tmpl := template.Must(template.ParseFiles("web/html/property_detail.html"))
 	err = tmpl.Execute(w, property)
 	if err != nil {
