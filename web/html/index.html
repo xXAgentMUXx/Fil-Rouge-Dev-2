@@ -4,112 +4,182 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../web/css/index.css">
-    <title>Y-Plaza - Accueil</title>
+    <title>Y-Plaza — Propriétés d'exception</title>
 </head>
 <body>
 
-<a href="/logout" class="back-btn">Déconnexion</a>
-<a href="/favorites" class="back-btn">⭐ Mes favoris</a>
-<a href="/profile" class="back-btn">Mon Profil</a>
+<!-- ── NAVBAR ── -->
+<nav class="navbar">
+    <a href="/" class="navbar-brand">Y<span>·</span>Plaza</a>
 
-{{if eq .UserRole "admin"}}
-<a href="/dashboard" class="back-btn">📊 Dashboard</a>
-{{end}}
+    <div class="navbar-links">
+        <a href="/profile" class="back-btn">Mon Profil</a>
+        <a href="/favorites" class="back-btn">&#9733; Favoris</a>
 
-<h1>Bienvenue sur Y-Plaza</h1>
+        {{if eq .UserRole "admin"}}
+        <a href="/dashboard" class="back-btn btn-dashboard">Dashboard</a>
+        {{end}}
 
-<h2>Nos Propriétés</h2>
+        <a href="/logout" class="back-btn btn-logout">Déconnexion</a>
+    </div>
+</nav>
 
-<form method="GET" action="/properties" class="search-form">
-    <input type="text" name="city" placeholder="Ville">
-    <input type="number" name="min_price" placeholder="Prix min">
-    <input type="number" name="max_price" placeholder="Prix max">
-    <input type="number" name="min_surface" placeholder="Surface min">
-    <button type="submit">Rechercher</button>
-</form>
+<!-- ── HERO ── -->
+<section class="hero">
+    <div>
+        <span class="hero-eyebrow">Immobilier de prestige</span>
+        <h1>Des biens <em>d'exception</em>,<br>à votre portée.</h1>
+    </div>
+    <div class="hero-stat">
+        <div class="hero-stat-number">{{len .Properties}}</div>
+        <div class="hero-stat-label">propriétés disponibles</div>
+    </div>
+</section>
 
-<div class="property-list">
-
-{{range .Properties}}
-
-<div class="property-card">
-
-<img src="{{if .Image}}{{.Image}}{{else}}/images/default-house.jpg{{end}}" 
-alt="Image propriété" 
-style="width:300px;height:auto;">
-
-<h3>{{.Title}}</h3>
-
-<p>{{.Description}}</p>
-
-<p>Ville : {{.City}}</p>
-
-<p>Prix : {{.Price}} €</p>
-
-<p>Surface : {{.Surface}} m²</p>
-
-<a href="/property?id={{.ID}}" class="details-btn">
-🔎 Plus de détails
-</a>
-
-{{if .IsSold}}
-
-<p class="sold">Propriété achetée</p>
-
-{{else}}
-
-    {{if eq $.UserRole "client"}}
-    <form action="/pay-property" method="POST">
-        <input type="hidden" name="property_id" value="{{.ID}}">
-        <input type="hidden" name="price" value="{{.Price}}">
-        <button type="submit">Acheter</button>
+<!-- ── SEARCH ── -->
+<section class="search-section">
+    <form method="GET" action="/properties" class="search-form">
+        <div class="search-field">
+            <label for="city">Ville</label>
+            <input type="text" id="city" name="city" placeholder="Paris, Lyon…">
+        </div>
+        <div class="search-field">
+            <label for="min_price">Prix min</label>
+            <input type="number" id="min_price" name="min_price" placeholder="0 €">
+        </div>
+        <div class="search-field">
+            <label for="max_price">Prix max</label>
+            <input type="number" id="max_price" name="max_price" placeholder="Sans limite">
+        </div>
+        <div class="search-field">
+            <label for="min_surface">Surface min</label>
+            <input type="number" id="min_surface" name="min_surface" placeholder="0 m²">
+        </div>
+        <button type="submit">Rechercher</button>
     </form>
-    {{end}}
+</section>
 
-    {{if or (eq $.UserRole "agent") (eq $.UserRole "admin")}}
-    <form method="POST" action="/sell-property">
-        <input type="hidden" name="property_id" value="{{.ID}}">
-        <input type="number" name="buyer_id" placeholder="ID acheteur" required>
-        <input type="number" name="sale_price" placeholder="Prix de vente" required>
-        <button type="submit">Vendre</button>
-    </form>
-    {{end}}
+<div class="divider"></div>
 
-    <form action="/favorite/add" method="POST">
-        <input type="hidden" name="property_id" value="{{.ID}}">
-        <button type="submit">❤️ Favori</button>
-    </form>
-
-    {{if or (eq $.UserRole "agent") (eq $.UserRole "admin")}}
-
-    <a href="/edit-property?id={{.ID}}" class="edit-btn">
-        ✏️ Modifier
-    </a>
-
-    <form action="/delete-property" method="POST" style="display:inline;">
-        <input type="hidden" name="id" value="{{.ID}}">
-        <button type="submit" class="delete-btn">
-            🗑 Supprimer
-        </button>
-    </form>
-
-    {{end}}
-
-{{end}}
-
+<!-- ── SECTION HEADER ── -->
+<div class="section-header" style="margin-top:36px;">
+    <h2>Nos Propriétés</h2>
+    <span class="section-count">{{len .Properties}} résultats</span>
 </div>
 
-{{end}}
+<!-- ── PROPERTY GRID ── -->
+<div class="property-list-wrapper">
+    <div class="property-list">
 
+        {{range .Properties}}
+        <article class="property-card">
+
+            <!-- IMAGE -->
+            <div class="card-image-wrap">
+                <img src="{{if .Image}}{{.Image}}{{else}}/images/default-house.jpg{{end}}"
+                     alt="{{.Title}}">
+
+                {{if .IsSold}}
+                <span class="card-badge-sold">Vendu</span>
+                {{end}}
+
+                {{if not .IsSold}}
+                <div class="card-badge-fav">
+                    <form action="/favorite/add" method="POST">
+                        <input type="hidden" name="property_id" value="{{.ID}}">
+                        <button type="submit" title="Ajouter aux favoris">&#9829;</button>
+                    </form>
+                </div>
+                {{end}}
+            </div>
+
+            <!-- BODY -->
+            <div class="card-body">
+                <p class="card-city">{{.City}}</p>
+                <h3 class="card-title">{{.Title}}</h3>
+                <p class="card-desc">{{.Description}}</p>
+
+                <div class="card-meta">
+                    <div class="card-meta-item">
+                        <span class="card-meta-label">Prix</span>
+                        <span class="card-meta-value price">{{.Price}} €</span>
+                    </div>
+                    <div class="card-meta-item">
+                        <span class="card-meta-label">Surface</span>
+                        <span class="card-meta-value">{{.Surface}} m²</span>
+                    </div>
+                </div>
+
+                <!-- ACTIONS -->
+                <div class="card-actions">
+
+                    {{if .IsSold}}
+                    <div class="sold-overlay">
+                        <span class="sold-label">Propriété vendue</span>
+                        <span class="sold-sublabel">Ce bien n'est plus disponible</span>
+                    </div>
+                    {{else}}
+
+                    <!-- Détails (toujours visible) -->
+                    <div class="card-actions-row">
+                        <a href="/property?id={{.ID}}" class="details-btn">
+                            Voir les détails &rarr;
+                        </a>
+                    </div>
+
+                    <!-- Achat (client) -->
+                    {{if eq $.UserRole "client"}}
+                    <form action="/pay-property" method="POST">
+                        <input type="hidden" name="property_id" value="{{.ID}}">
+                        <input type="hidden" name="price" value="{{.Price}}">
+                        <button type="submit" class="btn-buy">Acheter ce bien</button>
+                    </form>
+                    {{end}}
+
+                    <!-- Vente (agent / admin) -->
+                    {{if or (eq $.UserRole "agent") (eq $.UserRole "admin")}}
+                    <form method="POST" action="/sell-property" class="sell-form">
+                        <input type="hidden" name="property_id" value="{{.ID}}">
+                        <input type="number" name="buyer_id" placeholder="ID acheteur" required>
+                        <input type="number" name="sale_price" placeholder="Prix de vente (€)" required>
+                        <button type="submit" class="btn-sell">Enregistrer la vente</button>
+                    </form>
+                    {{end}}
+
+                    <!-- Edition / suppression (agent / admin) -->
+                    {{if or (eq $.UserRole "agent") (eq $.UserRole "admin")}}
+                    <div class="card-actions-row">
+                        <a href="/edit-property?id={{.ID}}" class="btn-edit">&#9998; Modifier</a>
+                        <form action="/delete-property" method="POST" style="flex:1;display:flex;">
+                            <input type="hidden" name="id" value="{{.ID}}">
+                            <button type="submit" class="delete-btn">&#128465; Supprimer</button>
+                        </form>
+                    </div>
+                    {{end}}
+
+                    {{end}}
+                </div>
+            </div>
+        </article>
+        {{end}}
+
+    </div>
 </div>
 
+<!-- ── ADD PROPERTY ── -->
 {{if or (eq .UserRole "agent") (eq .UserRole "admin")}}
-
-<a href="/add-property" class="add-property-btn">
-Ajouter une Propriété
-</a>
-
+<div class="add-property-section">
+    <a href="/add-property" class="add-property-btn">
+        Ajouter une propriété
+    </a>
+</div>
 {{end}}
+
+<!-- ── FOOTER ── -->
+<footer>
+    <span class="footer-brand">Y<span>·</span>Plaza</span>
+    <span>&copy; {{now.Year}} Y-Plaza &mdash; Tous droits réservés</span>
+</footer>
 
 </body>
 </html>
