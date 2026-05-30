@@ -1,74 +1,85 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="../web/css/add_property.css">
-<title>Ajouter une propriété - Y-Plaza</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../web/css/add_property.css">
+    <title>Ajouter une propriété — Y-Plaza</title>
 </head>
-
 <body>
 
-<div class="form-container">
-
-<a href="/properties" class="back-btn">⬅ Retour</a>
-
-<h1>🏡 Ajouter une nouvelle propriété</h1>
-
-<form action="/add-property" method="post" enctype="multipart/form-data" class="property-form">
-
-<div class="form-grid">
-
-<div class="form-group">
-<label>Titre</label>
-<input type="text" name="title" placeholder="Ex : Appartement centre ville" required>
+<div class="page-wrapper">
+    <a href="/properties" class="back-btn">Retour aux propriétés</a>
+    <div class="page-header">
+        <span class="page-eyebrow">Gestion du catalogue</span>
+        <h1>Ajouter une propriété</h1>
+    </div>
+    <div class="form-container">
+        <form action="/add-property" method="post" enctype="multipart/form-data" class="property-form">
+            <div class="form-section">
+                <p class="form-section-title">Informations principales</p>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="title">Titre</label>
+                        <input type="text" id="title" name="title"
+                               placeholder="Ex : Appartement centre-ville" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="city">Ville</label>
+                        <input type="text" id="city" name="city"
+                               placeholder="Ex : Marseille" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="price">Prix (€)</label>
+                        <input type="number" id="price" name="price"
+                               placeholder="Ex : 350 000" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="surface">Surface (m²)</label>
+                        <input type="number" id="surface" name="surface"
+                               placeholder="Ex : 85" required>
+                    </div>
+                    <div class="form-group full">
+                        <label for="description">Description</label>
+                        <textarea id="description" name="description"
+                                  placeholder="Décrivez la propriété, ses atouts, son environnement…" required></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="form-divider"></div>
+            <div class="form-section">
+                <p class="form-section-title">Agence &amp; médias</p>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="agency_id">Agence responsable</label>
+                        <div class="select-wrap">
+                            <select id="agency_id" name="agency_id" required>
+                                <option value="" disabled selected>Sélectionner une agence</option>
+                                {{range .}}
+                                <option value="{{.ID}}">{{.Name}}</option>
+                                {{end}}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Photo du bien</label>
+                        <div class="file-upload-zone">
+                            <span class="file-upload-icon">&#128247;</span>
+                            <p class="file-upload-text">
+                                <strong>Cliquer pour importer</strong> ou glisser-déposer
+                            </p>
+                            <p class="file-upload-hint">PNG, JPG, WEBP — 10 Mo max</p>
+                            <input type="file" name="image" accept="image/*">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-footer">
+                <a href="/properties" class="btn-cancel">Annuler</a>
+                <button type="submit" class="primary-btn">Publier la propriété</button>
+            </div>
+        </form>
+    </div>
 </div>
-
-<div class="form-group">
-<label>Ville</label>
-<input type="text" name="city" placeholder="Ex : Marseille" required>
-</div>
-
-<div class="form-group">
-<label>Prix (€)</label>
-<input type="number" name="price" placeholder="Ex : 350000" required>
-</div>
-
-<div class="form-group">
-<label>Surface (m²)</label>
-<input type="number" name="surface" placeholder="Ex : 85" required>
-</div>
-
-</div>
-
-<div class="form-group">
-<label>Description</label>
-<textarea name="description" placeholder="Décrivez la propriété..." required></textarea>
-</div>
-
-<div class="form-group">
-<label>Agence</label>
-<select name="agency_id" required>
-{{range .}}
-<option value="{{.ID}}">{{.Name}}</option>
-{{end}}
-</select>
-</div>
-
-<div class="form-group image-upload">
-
-<label>Image de la propriété</label>
-<input type="file" name="image" accept="image/*">
-
-</div>
-
-<button class="primary-btn" type="submit">
-Ajouter la propriété
-</button>
-
-</form>
-
-</div>
-
 </body>
 </html>

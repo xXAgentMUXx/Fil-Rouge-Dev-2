@@ -1,33 +1,41 @@
 <!DOCTYPE html>
 <html lang="fr">
-
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="../web/css/sold.css">
-<title>Paiement - Y-Plaza</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../web/css/sold.css">
+    <title>Paiement — Y-Plaza</title>
 </head>
-
 <body>
-
 <div class="payment-card">
-
-<h1>Paiement de la propriété</h1>
-
-<p>ID propriété : {{.PropertyID}}</p>
-
-<p class="price">{{.Price}} €</p>
-
-<form action="/pay-property" method="POST">
-
-<input type="hidden" name="property_id" value="{{.PropertyID}}">
-<input type="hidden" name="price" value="{{.Price}}">
-
-<button type="submit">
-💳 Payer avec Stripe
-</button>
-</form>
-<a href="/" class="back-btn">⬅ Retour</a>
+    <div class="card-inner">
+        <p class="card-eyebrow">Finaliser l'acquisition</p>
+        <h1 class="card-title">Paiement de la propriété</h1>
+        <div class="property-summary">
+            <div class="summary-row">
+                <span class="summary-label">Référence</span>
+                <span class="summary-value">#{{.PropertyID}}</span>
+            </div>
+            <div class="summary-divider"></div>
+            <div class="summary-row">
+                <span class="summary-label">Montant total</span>
+                <span class="summary-price">{{.Price}} €</span>
+            </div>
+        </div>
+        <p class="secure-badge">Paiement sécurisé via Stripe</p>
+        <form action="/pay-property" method="POST" style="width:100%">
+            <input type="hidden" name="property_id" value="{{.PropertyID}}">
+            <input type="hidden" name="price" value="{{.Price}}">
+            <button type="submit" class="pay-btn">
+                <span class="pay-btn-icon">&#128179;</span>
+                Payer avec Stripe
+            </button>
+        </form>
+        <a href="/" class="back-btn">Retour aux propriétés</a>
+        <div class="card-brand">
+            <span class="card-brand-name">Y<span>·</span>Plaza</span>
+        </div>
+    </div>
 </div>
 </body>
 </html>

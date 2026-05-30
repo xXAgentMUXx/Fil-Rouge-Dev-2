@@ -7,8 +7,6 @@
     <title>Y-Plaza — Propriétés d'exception</title>
 </head>
 <body>
-
-<!-- ── NAVBAR ── -->
 <nav class="navbar">
     <a href="/" class="navbar-brand">Y<span>·</span>Plaza</a>
 
@@ -24,7 +22,6 @@
     </div>
 </nav>
 
-<!-- ── HERO ── -->
 <section class="hero">
     <div>
         <span class="hero-eyebrow">Immobilier de prestige</span>
@@ -35,8 +32,6 @@
         <div class="hero-stat-label">propriétés disponibles</div>
     </div>
 </section>
-
-<!-- ── SEARCH ── -->
 <section class="search-section">
     <form method="GET" action="/properties" class="search-form">
         <div class="search-field">
@@ -60,21 +55,16 @@
 </section>
 
 <div class="divider"></div>
-
-<!-- ── SECTION HEADER ── -->
 <div class="section-header" style="margin-top:36px;">
     <h2>Nos Propriétés</h2>
     <span class="section-count">{{len .Properties}} résultats</span>
 </div>
-
-<!-- ── PROPERTY GRID ── -->
 <div class="property-list-wrapper">
     <div class="property-list">
 
         {{range .Properties}}
         <article class="property-card">
 
-            <!-- IMAGE -->
             <div class="card-image-wrap">
                 <img src="{{if .Image}}{{.Image}}{{else}}/images/default-house.jpg{{end}}"
                      alt="{{.Title}}">
@@ -93,7 +83,6 @@
                 {{end}}
             </div>
 
-            <!-- BODY -->
             <div class="card-body">
                 <p class="card-city">{{.City}}</p>
                 <h3 class="card-title">{{.Title}}</h3>
@@ -110,7 +99,6 @@
                     </div>
                 </div>
 
-                <!-- ACTIONS -->
                 <div class="card-actions">
 
                     {{if .IsSold}}
@@ -120,14 +108,12 @@
                     </div>
                     {{else}}
 
-                    <!-- Détails (toujours visible) -->
                     <div class="card-actions-row">
                         <a href="/property?id={{.ID}}" class="details-btn">
                             Voir les détails &rarr;
                         </a>
                     </div>
 
-                    <!-- Achat (client) -->
                     {{if eq $.UserRole "client"}}
                     <form action="/pay-property" method="POST">
                         <input type="hidden" name="property_id" value="{{.ID}}">
@@ -136,7 +122,6 @@
                     </form>
                     {{end}}
 
-                    <!-- Vente (agent / admin) -->
                     {{if or (eq $.UserRole "agent") (eq $.UserRole "admin")}}
                     <form method="POST" action="/sell-property" class="sell-form">
                         <input type="hidden" name="property_id" value="{{.ID}}">
@@ -146,7 +131,6 @@
                     </form>
                     {{end}}
 
-                    <!-- Edition / suppression (agent / admin) -->
                     {{if or (eq $.UserRole "agent") (eq $.UserRole "admin")}}
                     <div class="card-actions-row">
                         <a href="/edit-property?id={{.ID}}" class="btn-edit">&#9998; Modifier</a>
@@ -166,7 +150,6 @@
     </div>
 </div>
 
-<!-- ── ADD PROPERTY ── -->
 {{if or (eq .UserRole "agent") (eq .UserRole "admin")}}
 <div class="add-property-section">
     <a href="/add-property" class="add-property-btn">
@@ -175,10 +158,9 @@
 </div>
 {{end}}
 
-<!-- ── FOOTER ── -->
 <footer>
     <span class="footer-brand">Y<span>·</span>Plaza</span>
-    <span>&copy; {{now.Year}} Y-Plaza &mdash; Tous droits réservés</span>
+    <span>&copy; 2026 Y-Plaza &mdash; Tous droits réservés</span>
 </footer>
 
 </body>

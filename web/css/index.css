@@ -41,8 +41,7 @@ body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
 }
- 
-/* ── NAVBAR ── */
+
 .navbar {
   position: sticky;
   top: 0;
@@ -115,8 +114,7 @@ body {
 .back-btn.btn-dashboard:hover {
   background: var(--gold-dark);
 }
- 
-/* ── HERO ── */
+
 .hero {
   padding: 72px 48px 56px;
   max-width: 1280px;
@@ -170,8 +168,7 @@ body {
   color: var(--ink-light);
   margin-top: 4px;
 }
- 
-/* ── SEARCH FORM ── */
+
 .search-section {
   padding: 0 48px 48px;
   max-width: 1280px;
@@ -253,8 +250,7 @@ body {
   transform: translateY(-1px);
   box-shadow: var(--shadow-sm);
 }
- 
-/* ── SECTION HEADER ── */
+
 .section-header {
   padding: 0 48px 28px;
   max-width: 1280px;
@@ -277,8 +273,7 @@ body {
   font-size: 13px;
   color: var(--ink-light);
 }
- 
-/* ── PROPERTY GRID ── */
+
 .property-list-wrapper {
   padding: 0 48px;
   max-width: 1280px;
@@ -290,8 +285,7 @@ body {
   grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
   gap: 28px;
 }
- 
-/* ── PROPERTY CARD ── */
+
 .property-card {
   background: var(--white);
   border-radius: var(--radius-lg);
@@ -454,8 +448,7 @@ body {
   display: flex;
   gap: 8px;
 }
- 
-/* ── BUTTONS ── */
+
 .details-btn {
   display: inline-flex;
   align-items: center;
@@ -595,8 +588,7 @@ body {
 .delete-btn:hover {
   background: rgba(196, 97, 74, 0.15);
 }
- 
-/* ── ADD PROPERTY BUTTON ── */
+
 .add-property-section {
   padding: 48px;
   max-width: 1280px;
@@ -634,8 +626,7 @@ body {
   font-weight: 300;
   line-height: 1;
 }
- 
-/* ── SOLD STATE ── */
+
 .sold-overlay {
   display: flex;
   flex-direction: column;
@@ -657,8 +648,7 @@ body {
   font-size: 12px;
   color: var(--ink-light);
 }
- 
-/* ── DIVIDER ── */
+
 .divider {
   height: 1px;
   background: var(--border);
@@ -668,7 +658,6 @@ body {
   margin-right: auto;
 }
  
-/* ── FOOTER ── */
 footer {
   margin-top: 80px;
   padding: 40px 48px;

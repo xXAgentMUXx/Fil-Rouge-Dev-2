@@ -1,49 +1,52 @@
 <!DOCTYPE html>
 <html lang="fr">
-
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="../web/css/update.css">
-<title>Modifier mon compte - Y-Plaza</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../web/css/update.css">
+    <title>Modifier mon compte — Y-Plaza</title>
 </head>
-
 <body>
 
 <div class="account-card">
+    <div class="card-inner">
+        <a href="/properties" class="back-btn">Retour aux propriétés</a>
+        <p class="card-eyebrow">Mon espace</p>
+        <h2>Modifier mon compte</h2>
+        {{if ne .Provider "local"}}
+        <div class="provider-notice">
+            <span class="provider-notice-title">Compte {{.Provider}} détecté</span>
+            <p class="provider-notice-text">
+                Créez un mot de passe pour activer également la connexion par e-mail.
+            </p>
+        </div>
+        {{end}}
 
-<a href="/properties" class="back-btn">⬅ Retour</a>
+        <form action="/update-account" method="POST">
+            <div class="form-fields">
+                <div class="form-group">
+                    <label for="email">Nouvel e-mail</label>
+                    <input type="email" id="email" name="email"
+                           placeholder="votre@email.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">
+                        {{if ne .Provider "local"}}Créer un mot de passe{{else}}Nouveau mot de passe{{end}}
+                    </label>
+                    <input type="password" id="password" name="password"
+                           placeholder="••••••••" required>
+                </div>
+            </div>
+            <button type="submit" class="submit-btn">
+                {{if ne .Provider "local"}}Créer le mot de passe{{else}}Sauvegarder les modifications{{end}}
+            </button>
+        </form>
+        <a href="/profile" class="back-profile">← Retour au profil</a>
+        <div class="card-brand">
+            <span class="card-brand-name">Y<span>·</span>Plaza</span>
+        </div>
 
-<h2>Modifier mon compte</h2>
-
-{{ if ne .Provider "local" }}
-
-<p>Votre compte est connecté via {{ .Provider }}</p>
-<p>Créez un mot de passe pour activer la connexion email.</p>
-
-{{ end }}
-
-<form action="/update-account" method="POST">
-
-<label>Nouvel email</label>
-<input type="email" name="email" required>
-
-<label>Mot de passe</label>
-<input type="password" name="password" required>
-
-<button type="submit">
-{{ if ne .Provider "local" }}
-Créer mot de passe
-{{ else }}
-Modifier
-{{ end }}
-</button>
-
-</form>
-
-<a href="/profile" class="back-btn">⬅ Retour au profil</a>
-
+    </div>
 </div>
-
 </body>
 </html>

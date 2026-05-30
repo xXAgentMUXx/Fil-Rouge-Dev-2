@@ -1,84 +1,77 @@
 <!DOCTYPE html>
 <html lang="fr">
-
 <head>
-
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<link rel="stylesheet" href="../web/css/property_detail.css">
-
-<title>Détail propriété - Y-Plaza</title>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../web/css/property_detail.css">
+    <title>{{.Title}} — Y-Plaza</title>
 </head>
-
 <body>
 
+<nav class="navbar">
+    <a href="/properties" class="navbar-brand">Y<span>·</span>Plaza</a>
+    <div class="navbar-links">
+        <a href="/properties" class="back-btn">Propriétés</a>
+        <a href="/favorites" class="back-btn">&#9733; Favoris</a>
+        <a href="/profile" class="back-btn">Mon Profil</a>
+        <a href="/logout" class="back-btn btn-logout">Déconnexion</a>
+    </div>
+</nav>
+
 <div class="container">
-
-<div class="top-bar">
-
-<a href="/properties" class="back-btn">⬅ Retour</a>
-<a href="/favorites" class="back-btn">⭐ Mes favoris</a>
-<a href="/profile" class="back-btn">👤 Profil</a>
-<a href="/logout" class="back-btn">🚪 Déconnexion</a>
-
+    <div class="page-back">
+        <a href="/properties" class="page-back-link">Retour aux propriétés</a>
+    </div>
+    <div class="property-detail">
+        <div class="property-image-wrap">
+            <img src="{{if .Image}}{{.Image}}{{else}}/images/default-house.jpg{{end}}"
+                 alt="{{.Title}}">
+            {{if .IsSold}}
+            <span class="sold-ribbon">Vendu</span>
+            {{end}}
+        </div>
+        <div class="property-info">
+            <div class="property-eyebrow">
+                <span class="property-city-tag">{{.City}}</span>
+            </div>
+            <h1 class="property-title">{{.Title}}</h1>
+            <div class="property-kpis">
+                <div class="kpi-tile">
+                    <p class="kpi-tile-label">Prix</p>
+                    <p class="kpi-tile-value price">{{.Price}}<span class="kpi-tile-unit">€</span></p>
+                </div>
+                <div class="kpi-tile">
+                    <p class="kpi-tile-label">Surface</p>
+                    <p class="kpi-tile-value">{{.Surface}}<span class="kpi-tile-unit">m²</span></p>
+                </div>
+            </div>
+            <div class="property-section">
+                <p class="property-section-label">Description</p>
+                <p class="property-description">{{.Description}}</p>
+            </div>
+            <div class="property-section">
+                <p class="property-section-label">Mise en ligne</p>
+                <p class="property-date">{{ .CreatedAt.Format "02 janvier 2006 à 15:04" }}</p>
+            </div>
+            {{if .IsSold}}
+            <div class="sold-notice">
+                <span class="sold-notice-icon">&#10005;</span>
+                <span>Cette propriété a déjà été vendue.</span>
+            </div>
+            {{else}}
+            <div class="cta-group">
+                <form action="/pay-property" method="POST">
+                    <input type="hidden" name="property_id" value="{{.ID}}">
+                    <button type="submit" class="buy-btn">Acheter cette propriété</button>
+                </form>
+                <form action="/favorite/add" method="POST">
+                    <input type="hidden" name="property_id" value="{{.ID}}">
+                    <button type="submit" class="fav-btn">&#9829; Ajouter aux favoris</button>
+                </form>
+            </div>
+            {{end}}
+        </div>
+    </div>
 </div>
-
-<h1>{{.Title}}</h1>
-
-<div class="property-detail">
-
-<img src="{{if .Image}}{{.Image}}{{else}}/images/default-house.jpg{{end}}" 
-alt="Image propriété">
-
-<div class="property-info">
-
-<p><strong>Ville :</strong> {{.City}}</p>
-
-<p class="price">{{.Price}} €</p>
-
-<p><strong>Surface :</strong> {{.Surface}} m²</p>
-
-<p><strong>Description :</strong></p>
-
-<p>{{.Description}}</p>
-
-<p class="date"><strong>Date :</strong> {{ .CreatedAt.Format "02/01/2006 15:04" }}</p>
-
-{{if .IsSold}}
-
-<p class="sold">❌ Propriété déjà vendue</p>
-
-{{else}}
-
-<form action="/pay-property" method="POST">
-
-<input type="hidden" name="property_id" value="{{.ID}}">
-
-<button class="buy-btn">
-Acheter cette propriété
-</button>
-
-</form>
-
-<form action="/favorite/add" method="POST">
-
-<input type="hidden" name="property_id" value="{{.ID}}">
-
-<button class="fav-btn">
-❤️ Ajouter aux favoris
-</button>
-
-</form>
-
-{{end}}
-
-</div>
-
-</div>
-
-</div>
-
 </body>
 </html>

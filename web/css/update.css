@@ -1,118 +1,231 @@
-*{
-box-sizing:border-box;
-margin:0;
-padding:0;
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+:root {
+  --cream: #F7F3EE;
+  --ink: #1A1714;
+  --ink-muted: #4A453F;
+  --ink-light: #8C857C;
+  --gold: #C9A96E;
+  --gold-dark: #A8824A;
+  --gold-pale: #F0E6D3;
+  --terracotta: #C4614A;
+  --white: #FFFFFF;
+  --surface: #FAF7F4;
+  --border: rgba(26, 23, 20, 0.1);
+  --shadow-sm: 0 4px 16px rgba(26,23,20,0.08);
+  --shadow-md: 0 12px 40px rgba(26,23,20,0.12);
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-body: 'DM Sans', system-ui, sans-serif;
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-body{
-font-family:system-ui, sans-serif;
-background:#f5f7fb;
-display:flex;
-justify-content:center;
-align-items:center;
-min-height:100vh;
-padding:20px;
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
-.account-card{
-background:white;
-padding:25px;
-border-radius:12px;
-box-shadow:0 10px 25px rgba(0,0,0,0.08);
-width:100%;
-max-width:400px;
+body {
+  font-family: var(--font-body);
+  background: var(--cream);
+  color: var(--ink);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  -webkit-font-smoothing: antialiased;
 }
 
-h2{
-margin-bottom:20px;
-font-size:22px;
+.account-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  width: 100%;
+  max-width: 420px;
+  overflow: hidden;
 }
 
-label{
-font-weight:600;
-display:block;
-margin-bottom:6px;
+.account-card::before {
+  content: '';
+  display: block;
+  height: 4px;
+  background: linear-gradient(90deg, var(--gold) 0%, var(--gold-dark) 100%);
 }
 
-.back-btn{
-display:inline-block;
-margin-bottom:15px;
-text-decoration:none;
-color:#2563eb;
-font-weight:500;
+.card-inner {
+  padding: 36px 36px 32px;
+  display: flex;
+  flex-direction: column;
 }
 
-.back-btn:hover{
-text-decoration:underline;
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+  color: var(--ink-muted);
+  font-size: 13px;
+  font-weight: 500;
+  transition: var(--transition);
+  margin-bottom: 24px;
+  align-self: flex-start;
 }
 
-input{
-width:100%;
-padding:12px;
-border-radius:6px;
-border:1px solid #ddd;
-margin-bottom:16px;
-font-size:14px;
+.back-btn::before {
+  content: '←';
+  transition: var(--transition);
 }
 
-input:focus{
-outline:none;
-border-color:#2563eb;
+.back-btn:hover { color: var(--gold-dark); }
+.back-btn:hover::before { transform: translateX(-3px); }
+
+.card-eyebrow {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 8px;
 }
 
-button{
-width:100%;
-background:#2563eb;
-color:white;
-border:none;
-padding:12px;
-border-radius:6px;
-font-size:15px;
-cursor:pointer;
-transition:0.2s;
+.card-inner h2 {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  margin-bottom: 28px;
 }
 
-button:hover{
-background:#1e40af;
+.provider-notice {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 16px;
+  background: var(--gold-pale);
+  border: 1px solid rgba(201, 169, 110, 0.3);
+  border-radius: var(--radius-md);
+  margin-bottom: 24px;
 }
 
-.back-btn{
-display:block;
-margin-top:20px;
-text-align:center;
-text-decoration:none;
-color:#2563eb;
-font-weight:500;
+.provider-notice-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--gold-dark);
 }
 
-.back-btn:hover{
-text-decoration:underline;
+.provider-notice-text {
+  font-size: 12.5px;
+  color: var(--ink-muted);
+  line-height: 1.5;
 }
 
-@media (min-width:375px){
-.account-card{
-padding:30px;
-}
+.form-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 20px;
 }
 
-@media (min-width:425px){
-h2{
-font-size:24px;
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
+
+.form-group label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-light);
 }
-@media (min-width:768px){
-.account-card{
-padding:35px;
-max-width:420px;
+
+.form-group input {
+  width: 100%;
+  padding: 13px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--ink);
+  background: var(--surface);
+  outline: none;
+  transition: var(--transition);
 }
+
+.form-group input::placeholder {
+  color: var(--ink-light);
 }
-@media (min-width:1024px){
-.account-card{
-max-width:450px;
+
+.form-group input:focus {
+  border-color: var(--gold);
+  background: var(--white);
+  box-shadow: 0 0 0 3px rgba(201, 169, 110, 0.15);
 }
+
+.submit-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 14px 24px;
+  background: var(--ink);
+  color: var(--white);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: 14.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  letter-spacing: 0.02em;
+  margin-bottom: 16px;
 }
-@media (min-width:1440px){
-.account-card{
-max-width:500px;
+
+.submit-btn:hover {
+  background: var(--gold-dark);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
 }
+
+.back-profile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  text-decoration: none;
+  color: var(--ink-light);
+  font-size: 13px;
+  font-weight: 500;
+  transition: var(--transition);
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.back-profile:hover { color: var(--gold-dark); }
+
+.card-brand {
+  text-align: center;
+  margin-top: 24px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border);
+}
+
+.card-brand-name {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink-light);
+}
+
+.card-brand-name span { color: var(--gold); }
+
+@media (max-width: 480px) {
+  .card-inner { padding: 28px 22px 24px; }
 }

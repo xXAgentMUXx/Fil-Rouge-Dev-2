@@ -1,69 +1,118 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="../web/css/dashboard.css">
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<title>Dashboard Admin - Y-Plaza</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../web/css/dashboard.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>Dashboard — Y-Plaza</title>
 </head>
 <body>
 
 <div class="container">
+    <a href="/properties" class="back-btn">Retour aux propriétés</a>
+    <div class="page-header">
+        <div class="page-header-left">
+            <span class="page-eyebrow">Administration</span>
+            <h1>Dashboard</h1>
+        </div>
+        <p class="page-date">Vue d'ensemble du catalogue</p>
+    </div>
+    <section>
+        <p class="section-label">Indicateurs clés</p>
+        <div class="kpi-grid">
 
-<a href="/properties" class="back-btn">⬅ Retour</a>
+            <div class="kpi-card accent">
+                <span class="kpi-icon">&#8364;</span>
+                <p class="kpi-label">Total des ventes</p>
+                <p class="kpi-value gold">{{.TotalSales}}<span class="kpi-unit">€</span></p>
+            </div>
 
-<h1>📊 Dashboard Admin</h1>
+            <div class="kpi-card">
+                <span class="kpi-icon">&#10003;</span>
+                <p class="kpi-label">Biens vendus</p>
+                <p class="kpi-value">{{.TotalSold}}</p>
+            </div>
 
-<section class="stats">
-<h2>Statistiques</h2>
-<p>Total des ventes : {{.TotalSales}} €</p>
-<p>Biens vendus : {{.TotalSold}}</p>
-<p>Total propriétés : {{.TotalProperties}}</p>
-</section>
+            <div class="kpi-card">
+                <span class="kpi-icon">&#9632;</span>
+                <p class="kpi-label">Total propriétés</p>
+                <p class="kpi-value">{{.TotalProperties}}</p>
+            </div>
 
-<section class="top-cities">
-<h2>🌍 Villes populaires</h2>
-<ul>
-{{range .TopCities}}
-<li>{{.City}} : {{.Total}} biens</li>
-{{end}}
-</ul>
-</section>
-
-<section class="chart-section">
-<h2>📈 Graphique des propriétés par ville</h2>
-<canvas id="citiesChart"></canvas>
-</section>
-
-<section class="expensive-properties">
-<h2>💎 Biens les plus chers</h2>
-<ul>
-{{range .ExpensiveProperties}}
-<li>{{.Title}} - {{.City}} - {{.Price}} €</li>
-{{end}}
-</ul>
-</section>
-
-<section class="latest-properties">
-<h2>🆕 Dernières propriétés</h2>
-<ul>
-{{range .LatestProperties}}
-<li>{{.Title}} - {{.City}} - {{.Price}} €</li>
-{{end}}
-</ul>
-</section>
+        </div>
+    </section>
+    <section class="chart-panel">
+        <div class="panel-header">
+            <h2>Propriétés par ville</h2>
+            <span class="panel-count">Top {{len .TopCities}} villes</span>
+        </div>
+        <div class="chart-wrap">
+            <canvas id="citiesChart"></canvas>
+        </div>
+    </section>
+    <div class="two-col">
+        <div class="panel">
+            <div class="panel-header">
+                <h2>Villes populaires</h2>
+                <span class="panel-count">{{len .TopCities}} entrées</span>
+            </div>
+            <ul class="panel-list">
+                {{range $i, $c := .TopCities}}
+                <li class="panel-item">
+                    <div class="panel-item-left">
+                        <span class="panel-rank {{if eq $i 0}}top{{end}}">{{if eq $i 0}}1{{else if eq $i 1}}2{{else if eq $i 2}}3{{else if eq $i 3}}4{{else if eq $i 4}}5{{else}}—{{end}}</span>
+                        <span class="panel-item-name">{{$c.City}}</span>
+                    </div>
+                    <span class="panel-item-badge">{{$c.Total}} biens</span>
+                </li>
+                {{end}}
+            </ul>
+        </div>
+        <div class="panel">
+            <div class="panel-header">
+                <h2>Dernières propriétés</h2>
+                <span class="panel-count">{{len .LatestProperties}} ajoutées</span>
+            </div>
+            <ul class="panel-list">
+                {{range .LatestProperties}}
+                <li class="panel-item">
+                    <div class="panel-item-left" style="flex-direction:column;align-items:flex-start;gap:2px">
+                        <span class="panel-item-name">{{.Title}}</span>
+                        <span class="panel-item-sub">{{.City}}</span>
+                    </div>
+                    <span class="panel-item-price">{{.Price}} €</span>
+                </li>
+                {{end}}
+            </ul>
+        </div>
+    </div>
+    <div class="panel">
+        <div class="panel-header">
+            <h2>Biens les plus chers</h2>
+            <span class="panel-count">Top {{len .ExpensiveProperties}}</span>
+        </div>
+        <ul class="panel-list">
+            {{range $i, $p := .ExpensiveProperties}}
+            <li class="panel-item">
+                <div class="panel-item-left">
+                    <span class="panel-rank {{if eq $i 0}}top{{end}}">{{if eq $i 0}}1{{else if eq $i 1}}2{{else if eq $i 2}}3{{else if eq $i 3}}4{{else if eq $i 4}}5{{else}}—{{end}}</span>
+                    <div style="display:flex;flex-direction:column;gap:2px;min-width:0">
+                        <span class="panel-item-name">{{$p.Title}}</span>
+                        <span class="panel-item-sub">{{$p.City}}</span>
+                    </div>
+                </div>
+                <span class="panel-item-price">{{$p.Price}} €</span>
+            </li>
+            {{end}}
+        </ul>
+    </div>
 
 </div>
 
 <script>
-const cities = [
-{{range .TopCities}}"{{.City}}",{{end}}
-];
-
-const totals = [
-{{range .TopCities}}{{.Total}},{{end}}
-];
+const cities = [{{range .TopCities}}"{{.City}}",{{end}}];
+const totals  = [{{range .TopCities}}{{.Total}},{{end}}];
 
 const ctx = document.getElementById('citiesChart').getContext('2d');
 new Chart(ctx, {
@@ -73,12 +122,48 @@ new Chart(ctx, {
         datasets: [{
             label: 'Nombre de propriétés',
             data: totals,
-            backgroundColor: '#2563eb'
+            backgroundColor: 'rgba(201,169,110,0.75)',
+            borderColor: '#A8824A',
+            borderWidth: 1.5,
+            borderRadius: 6,
+            borderSkipped: false
         }]
     },
     options: {
         responsive: true,
-        maintainAspectRatio: false
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { display: false },
+            tooltip: {
+                backgroundColor: '#1A1714',
+                titleColor: '#C9A96E',
+                bodyColor: '#FAF7F4',
+                padding: 12,
+                cornerRadius: 8,
+                callbacks: {
+                    label: ctx => ` ${ctx.parsed.y} propriété${ctx.parsed.y > 1 ? 's' : ''}`
+                }
+            }
+        },
+        scales: {
+            x: {
+                grid: { display: false },
+                border: { display: false },
+                ticks: {
+                    font: { family: "'DM Sans', sans-serif", size: 12 },
+                    color: '#8C857C'
+                }
+            },
+            y: {
+                grid: { color: 'rgba(26,23,20,0.06)' },
+                border: { display: false, dash: [4, 4] },
+                ticks: {
+                    font: { family: "'DM Sans', sans-serif", size: 12 },
+                    color: '#8C857C',
+                    stepSize: 1
+                }
+            }
+        }
     }
 });
 </script>

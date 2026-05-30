@@ -1,35 +1,61 @@
 <!DOCTYPE html>
 <html lang="fr">
-
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="../web/css/favorite.css">
-<title>Mes Favoris - Y-Plaza</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../web/css/favorite.css">
+    <title>Mes Favoris — Y-Plaza</title>
 </head>
-
 <body>
+<nav class="navbar">
+    <a href="/properties" class="navbar-brand">Y<span>·</span>Plaza</a>
+    <div class="navbar-links">
+        <a href="/properties" class="back-btn">Propriétés</a>
+        <a href="/profile" class="back-btn">Mon Profil</a>
+        <a href="/logout" class="back-btn btn-logout">Déconnexion</a>
+    </div>
+</nav>
+
 <div class="container">
-<div class="top-bar">
-<a href="/properties" class="back-btn">⬅ Retour</a>
-<a href="/profile" class="back-btn">👤 Profil</a>
-<a href="/logout" class="back-btn">🚪 Déconnexion</a>
+    <div class="page-hero">
+        <div>
+            <span class="page-eyebrow">Mon espace</span>
+            <h1>Mes Favoris</h1>
+        </div>
+        <span class="hero-count">{{len .}} bien{{if gt (len .) 1}}s{{end}} sauvegardé{{if gt (len .) 1}}s{{end}}</span>
+    </div>
+    {{if .}}
+    <div class="favorites-list">
+        {{range .}}
+        <article class="property-card">
+            <div class="card-accent"></div>
+            <div class="card-body">
+                <p class="card-city">{{.City}}</p>
+                <h3 class="card-title">{{.Title}}</h3>
+                <p class="card-price">{{.Price}}<span>€</span></p>
+
+                <div class="card-actions">
+                    <a href="/property?id={{.ID}}" class="details-btn">Voir le détail →</a>
+                    <form action="/favorite/remove" method="POST">
+                        <input type="hidden" name="property_id" value="{{.ID}}">
+                        <button type="submit" class="btn-remove" title="Retirer des favoris">&#10005;</button>
+                    </form>
+                </div>
+            </div>
+        </article>
+        {{end}}
+    </div>
+
+    {{else}}
+    <div class="empty-state">
+        <span class="empty-icon">&#9733;</span>
+        <p class="empty-title">Aucun favori pour l'instant</p>
+        <p class="empty-text">Parcourez nos propriétés et ajoutez vos coups de cœur pour les retrouver ici.</p>
+        <a href="/properties" class="empty-link">Découvrir les propriétés →</a>
+    </div>
+    {{end}}
+
 </div>
-<h1>⭐ Mes Favoris</h1>
-<div class="favorites-list">
-{{range .}}
-<div class="property-card">
-<h3>{{.Title}}</h3>
-<p class="city">{{.City}}</p>
-<p class="price">{{.Price}} €</p>
-<form action="/favorite/remove" method="POST">
-<input type="hidden" name="property_id" value="{{.ID}}">
-<button type="submit">❌ Retirer</button>
-</form>
-<a href="/property?id={{.ID}}" class="details-btn">🔎 Voir le détail</a>
-</div>
-{{end}}
-</div>
-</div>
+
 </body>
 </html>

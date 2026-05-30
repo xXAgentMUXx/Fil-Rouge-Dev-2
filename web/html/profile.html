@@ -1,95 +1,91 @@
 <!DOCTYPE html>
 <html lang="fr">
-
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Profil - Y-Plaza</title>
-<link rel="stylesheet" href="/web/css/profile.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mon Profil — Y-Plaza</title>
+    <link rel="stylesheet" href="/web/css/profile.css">
 </head>
-
 <body>
 
 <div class="profile-container">
-
-<a href="/properties" class="back-btn">⬅ Retour aux propriétés</a>
-
-<h1>Mon Profil</h1>
-
-<section class="profile-section">
-
-<h2>Informations du compte</h2>
-
-<p><strong>Email :</strong> {{.Email}}</p>
-<p><strong>Rôle :</strong> {{.Role}}</p>
-
-{{ if eq .Provider "local" }}
-
-<p>Connecter votre compte :</p>
-
-<div class="oauth">
-    <a href="/auth/google" class="oauth-btn google">
-        <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="google">
-        Connecter Google
-    </a>
-
-    <a href="/auth/github" class="oauth-btn github">
-        <img src="https://www.svgrepo.com/show/512317/github-142.svg" alt="github">
-        Connecter GitHub
-    </a>
+    <a href="/properties" class="back-btn">Retour aux propriétés</a>
+    <div class="page-header">
+        <div>
+            <span class="page-eyebrow">Mon espace</span>
+            <h1>Mon Profil</h1>
+        </div>
+        <div class="profile-actions">
+            <a href="/favorites" class="btn-action secondary">&#9733; Mes favoris</a>
+            <a href="/update" class="btn-action primary">Modifier le compte</a>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header">
+            <h2>Informations du compte</h2>
+        </div>
+        <div class="card-body">
+            <div class="info-grid">
+                <div class="info-item">
+                    <span class="info-label">Adresse e-mail</span>
+                    <span class="info-value">{{.Email}}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Rôle</span>
+                    <span class="role-badge">{{.Role}}</span>
+                </div>
+            </div>
+            {{if eq .Provider "local"}}
+            <div class="oauth-divider">
+                <span class="oauth-divider-line"></span>
+                <span class="oauth-divider-text">Connecter un compte tiers</span>
+                <span class="oauth-divider-line"></span>
+            </div>
+            <div class="oauth">
+                <a href="/auth/google" class="oauth-btn google">
+                    <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google">
+                    Connecter Google
+                </a>
+                <a href="/auth/github" class="oauth-btn github">
+                    <img src="https://www.svgrepo.com/show/512317/github-142.svg" alt="GitHub">
+                    Connecter GitHub
+                </a>
+            </div>
+            {{end}}
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header">
+            <h2>Propriétés achetées</h2>
+        </div>
+        <div class="card-body">
+            {{if .Purchases}}
+            <ul class="property-list">
+                {{range .Purchases}}
+                <li>{{.}}</li>
+                {{end}}
+            </ul>
+            {{else}}
+            <p class="empty-msg">Aucune propriété achetée pour le moment.</p>
+            {{end}}
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header">
+            <h2>Propriétés vendues</h2>
+        </div>
+        <div class="card-body">
+            {{if .Sales}}
+            <ul class="property-list sales">
+                {{range .Sales}}
+                <li>{{.}}</li>
+                {{end}}
+            </ul>
+            {{else}}
+            <p class="empty-msg">Aucune propriété vendue pour le moment.</p>
+            {{end}}
+        </div>
+    </div>
 </div>
-
-{{ end }}
-
-</section>
-
-<hr>
-
-<section class="profile-section">
-
-<h2>🏠 Propriétés achetées</h2>
-
-{{if .Purchases}}
-<ul>
-{{range .Purchases}}
-<li>{{.}}</li>
-{{end}}
-</ul>
-{{else}}
-<p>Aucune propriété achetée</p>
-{{end}}
-
-</section>
-
-<hr>
-
-<section class="profile-section">
-
-<h2>💰 Propriétés vendues</h2>
-
-{{if .Sales}}
-<ul>
-{{range .Sales}}
-<li>{{.}}</li>
-{{end}}
-</ul>
-{{else}}
-<p>Aucune propriété vendue</p>
-{{end}}
-
-</section>
-
-<hr>
-
-<div class="profile-actions">
-
-<a href="/favorites">⭐ Voir mes favoris</a>
-
-<a href="/update">🔄 Modifier le compte</a>
-
-</div>
-
-</div>
-
 </body>
 </html>
