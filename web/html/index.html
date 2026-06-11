@@ -4,35 +4,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../web/css/index.css">
-    <title>Y-Plaza — Propriétés d'exception</title>
+    <title>Y-Plaza — Propriétés</title>
 </head>
 <body>
-<nav class="navbar">
-    <a href="/" class="navbar-brand">Y<span>·</span>Plaza</a>
 
+<nav class="navbar">
+    <a href="/" class="navbar-brand">Y-Plaza</a>
     <div class="navbar-links">
         <a href="/profile" class="back-btn">Mon Profil</a>
-        <a href="/favorites" class="back-btn">&#9733; Favoris</a>
-
+        <a href="/favorites" class="back-btn">Favoris</a>
         {{if eq .UserRole "admin"}}
         <a href="/dashboard" class="back-btn btn-dashboard">Dashboard</a>
         {{end}}
-
         <a href="/logout" class="back-btn btn-logout">Déconnexion</a>
     </div>
 </nav>
 
-<section class="hero">
+<div class="hero">
     <div>
-        <span class="hero-eyebrow">Immobilier de prestige</span>
-        <h1>Des biens <em>d'exception</em>,<br>à votre portée.</h1>
+        <span class="hero-eyebrow">Catalogue immobilier</span>
+        <h1>Trouvez votre<br>bien <em>idéal</em>.</h1>
     </div>
     <div class="hero-stat">
         <div class="hero-stat-number">{{len .Properties}}</div>
         <div class="hero-stat-label">propriétés disponibles</div>
     </div>
-</section>
-<section class="search-section">
+</div>
+
+<div class="search-section">
     <form method="GET" action="/properties" class="search-form">
         <div class="search-field">
             <label for="city">Ville</label>
@@ -44,7 +43,7 @@
         </div>
         <div class="search-field">
             <label for="max_price">Prix max</label>
-            <input type="number" id="max_price" name="max_price" placeholder="Sans limite">
+            <input type="number" id="max_price" name="max_price" placeholder="Max">
         </div>
         <div class="search-field">
             <label for="min_surface">Surface min</label>
@@ -52,13 +51,13 @@
         </div>
         <button type="submit">Rechercher</button>
     </form>
-</section>
+</div>
 
-<div class="divider"></div>
-<div class="section-header" style="margin-top:36px;">
-    <h2>Nos Propriétés</h2>
+<div class="section-header">
+    <h2>Propriétés</h2>
     <span class="section-count">{{len .Properties}} résultats</span>
 </div>
+
 <div class="property-list-wrapper">
     <div class="property-list">
 
@@ -66,13 +65,10 @@
         <article class="property-card">
 
             <div class="card-image-wrap">
-                <img src="{{if .Image}}{{.Image}}{{else}}/images/default-house.jpg{{end}}"
-                     alt="{{.Title}}">
-
+                <img src="{{if .Image}}{{.Image}}{{else}}/images/default-house.jpg{{end}}" alt="{{.Title}}">
                 {{if .IsSold}}
                 <span class="card-badge-sold">Vendu</span>
                 {{end}}
-
                 {{if not .IsSold}}
                 <div class="card-badge-fav">
                     <form action="/favorite/add" method="POST">
@@ -100,7 +96,6 @@
                 </div>
 
                 <div class="card-actions">
-
                     {{if .IsSold}}
                     <div class="sold-overlay">
                         <span class="sold-label">Propriété vendue</span>
@@ -109,9 +104,7 @@
                     {{else}}
 
                     <div class="card-actions-row">
-                        <a href="/property?id={{.ID}}" class="details-btn">
-                            Voir les détails &rarr;
-                        </a>
+                        <a href="/property?id={{.ID}}" class="details-btn">Voir les détails →</a>
                     </div>
 
                     {{if eq $.UserRole "client"}}
@@ -152,14 +145,12 @@
 
 {{if or (eq .UserRole "agent") (eq .UserRole "admin")}}
 <div class="add-property-section">
-    <a href="/add-property" class="add-property-btn">
-        Ajouter une propriété
-    </a>
+    <a href="/add-property" class="add-property-btn">Ajouter une propriété</a>
 </div>
 {{end}}
 
 <footer>
-    <span class="footer-brand">Y<span>·</span>Plaza</span>
+    <span class="footer-brand">Y-Plaza</span>
     <span>&copy; 2026 Y-Plaza &mdash; Tous droits réservés</span>
 </footer>
 

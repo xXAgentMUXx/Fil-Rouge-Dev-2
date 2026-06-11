@@ -7,31 +7,26 @@
     <title>Inscription — Y-Plaza</title>
 </head>
 <body>
-
 <div class="container">
     <div class="card-inner">
         <div class="card-brand">
-            <a href="/" class="brand-name">Y<span>·</span>Plaza</a>
+            <a href="/" class="brand-name">Y-Plaza</a>
         </div>
         <div class="card-header">
             <span class="card-eyebrow">Bienvenue</span>
             <h1>Créer un compte</h1>
         </div>
         <form action="/post-register" method="POST" class="form">
-
             <div class="form-group">
                 <label for="email">Adresse e-mail</label>
-                <input type="email" id="email" name="email"
-                       placeholder="exemple@mail.com" required>
+                <input type="email" id="email" name="email" placeholder="exemple@mail.com" required>
             </div>
             <div class="form-group">
                 <label for="password">Mot de passe</label>
-                <input type="password" id="password" name="password"
-                       placeholder="••••••••" required>
+                <input type="password" id="password" name="password" placeholder="••••••••" required>
             </div>
             <button type="submit" class="btn">Créer mon compte</button>
         </form>
-        <!-- SEPARATOR -->
         <div class="separator"><span>OU</span></div>
         <div class="oauth">
             <a href="/auth/google" class="oauth-btn google">
@@ -48,6 +43,5 @@
         </p>
     </div>
 </div>
-
 </body>
 </html>

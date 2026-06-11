@@ -7,7 +7,6 @@
     <title>Ajouter une propriété — Y-Plaza</title>
 </head>
 <body>
-
 <div class="page-wrapper">
     <a href="/properties" class="back-btn">Retour aux propriétés</a>
     <div class="page-header">
@@ -15,34 +14,29 @@
         <h1>Ajouter une propriété</h1>
     </div>
     <div class="form-container">
-        <form action="/add-property" method="post" enctype="multipart/form-data" class="property-form">
+        <form action="/add-property" method="post" enctype="multipart/form-data">
             <div class="form-section">
                 <p class="form-section-title">Informations principales</p>
                 <div class="form-grid">
                     <div class="form-group">
                         <label for="title">Titre</label>
-                        <input type="text" id="title" name="title"
-                               placeholder="Ex : Appartement centre-ville" required>
+                        <input type="text" id="title" name="title" placeholder="Ex : Appartement centre-ville" required>
                     </div>
                     <div class="form-group">
                         <label for="city">Ville</label>
-                        <input type="text" id="city" name="city"
-                               placeholder="Ex : Marseille" required>
+                        <input type="text" id="city" name="city" placeholder="Ex : Marseille" required>
                     </div>
                     <div class="form-group">
                         <label for="price">Prix (€)</label>
-                        <input type="number" id="price" name="price"
-                               placeholder="Ex : 350 000" required>
+                        <input type="number" id="price" name="price" placeholder="Ex : 350000" required>
                     </div>
                     <div class="form-group">
                         <label for="surface">Surface (m²)</label>
-                        <input type="number" id="surface" name="surface"
-                               placeholder="Ex : 85" required>
+                        <input type="number" id="surface" name="surface" placeholder="Ex : 85" required>
                     </div>
                     <div class="form-group full">
                         <label for="description">Description</label>
-                        <textarea id="description" name="description"
-                                  placeholder="Décrivez la propriété, ses atouts, son environnement…" required></textarea>
+                        <textarea id="description" name="description" placeholder="Décrivez la propriété, ses atouts, son environnement…" required></textarea>
                     </div>
                 </div>
             </div>
@@ -65,15 +59,14 @@
                         <label>Photo du bien</label>
                         <div class="file-upload-zone">
                             <span class="file-upload-icon">&#128247;</span>
-                            <p class="file-upload-text">
-                                <strong>Cliquer pour importer</strong> ou glisser-déposer
-                            </p>
+                            <p class="file-upload-text"><strong>Cliquer pour importer</strong> ou glisser-déposer</p>
                             <p class="file-upload-hint">PNG, JPG, WEBP — 10 Mo max</p>
                             <input type="file" name="image" accept="image/*">
                         </div>
                     </div>
                 </div>
             </div>
+            <div class="form-divider"></div>
             <div class="form-footer">
                 <a href="/properties" class="btn-cancel">Annuler</a>
                 <button type="submit" class="primary-btn">Publier la propriété</button>

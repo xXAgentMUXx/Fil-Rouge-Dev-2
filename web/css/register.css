@@ -1,157 +1,173 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
 
 :root {
-  --cream: #F7F3EE;
-  --ink: #1A1714;
-  --ink-muted: #4A453F;
-  --ink-light: #8C857C;
-  --gold: #C9A96E;
-  --gold-dark: #A8824A;
-  --gold-pale: #F0E6D3;
+  --bg: #0E0F11;
+  --surface: #16181C;
+  --surface2: #1E2026;
+  --surface3: #252830;
+  --border: #2A2D35;
+  --border2: #353840;
+  --text: #F0F2F7;
+  --text2: #8B909E;
+  --text3: #555A66;
+  --accent: #6366F1;
+  --accent2: #818CF8;
   --white: #FFFFFF;
-  --surface: #FAF7F4;
-  --border: rgba(26, 23, 20, 0.1);
-  --shadow-sm: 0 4px 16px rgba(26,23,20,0.08);
-  --shadow-md: 0 12px 40px rgba(26,23,20,0.12);
-  --font-display: 'Playfair Display', Georgia, serif;
-  --font-body: 'DM Sans', system-ui, sans-serif;
-  --radius-sm: 6px;
-  --radius-md: 12px;
-  --radius-lg: 18px;
-  --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --r8: 8px;
+  --r12: 12px;
+  --r16: 16px;
+  --r100: 100px;
+  --font-ui: 'Inter', system-ui, sans-serif;
+  --font-display: 'Space Grotesk', system-ui, sans-serif;
+  --transition: all 0.15s ease;
 }
 
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
 body {
-  font-family: var(--font-body);
-  background: var(--cream);
-  color: var(--ink);
+  font-family: var(--font-ui);
+  background: var(--bg);
+  color: var(--text);
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 24px;
   -webkit-font-smoothing: antialiased;
+  position: relative;
 }
 
 body::before {
   content: '';
   position: fixed;
   inset: 0;
-  background-image: radial-gradient(rgba(201,169,110,0.07) 1px, transparent 1px);
+  background-image: radial-gradient(rgba(99, 102, 241, 0.08) 1px, transparent 1px);
   background-size: 28px 28px;
   pointer-events: none;
 }
 
 .container {
-  background: var(--white);
+  background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-md);
+  border-radius: var(--r16);
   width: 100%;
-  max-width: 420px;
+  max-width: 400px;
   overflow: hidden;
-  animation: fadeUp 0.45s cubic-bezier(0.4, 0, 0.2, 1) both;
+  animation: fadeUp 0.35s ease both;
   position: relative;
 }
 
 .container::before {
   content: '';
   display: block;
-  height: 4px;
-  background: linear-gradient(90deg, var(--gold) 0%, var(--gold-dark) 100%);
+  height: 3px;
+  background: var(--accent);
 }
 
 .card-inner {
-  padding: 40px 38px 36px;
+  padding: 36px 34px 30px;
 }
 
 .card-brand {
   text-align: center;
-  margin-bottom: 28px;
+  margin-bottom: 24px;
 }
 
 .brand-name {
   font-family: var(--font-display);
-  font-size: 22px;
+  font-size: 18px;
   font-weight: 700;
-  color: var(--ink);
-  letter-spacing: -0.02em;
+  color: var(--white);
   text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
-.brand-name span { color: var(--gold); }
+.brand-name::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  background: var(--accent);
+  border-radius: 50%;
+}
+
+.brand-name span {
+  display: none;
+}
 
 .card-header {
   text-align: center;
-  margin-bottom: 32px;
+  margin-bottom: 26px;
 }
 
 .card-eyebrow {
   display: block;
   font-size: 10px;
   font-weight: 600;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.07em;
   text-transform: uppercase;
-  color: var(--gold);
-  margin-bottom: 8px;
+  color: var(--accent2);
+  margin-bottom: 6px;
 }
 
 .card-header h1 {
   font-family: var(--font-display);
-  font-size: 28px;
+  font-size: 24px;
   font-weight: 700;
   letter-spacing: -0.02em;
+  color: var(--white);
   line-height: 1.2;
 }
 
 .form {
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  margin-bottom: 24px;
+  gap: 13px;
+  margin-bottom: 18px;
 }
 
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 5px;
 }
 
 .form-group label {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 600;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.07em;
   text-transform: uppercase;
-  color: var(--ink-light);
+  color: var(--text3);
 }
 
 .form-group input {
   width: 100%;
-  padding: 13px 16px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  font-family: var(--font-body);
-  font-size: 14px;
-  color: var(--ink);
-  background: var(--surface);
+  padding: 11px 13px;
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: var(--r8);
+  font-family: var(--font-ui);
+  font-size: 13.5px;
+  color: var(--text);
   outline: none;
   transition: var(--transition);
 }
 
 .form-group input::placeholder {
-  color: var(--ink-light);
+  color: var(--text3);
 }
 
 .form-group input:focus {
-  border-color: var(--gold);
-  background: var(--white);
-  box-shadow: 0 0 0 3px rgba(201, 169, 110, 0.15);
+  border-color: var(--accent);
+  background: var(--surface3);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
 }
 
 .btn {
@@ -159,31 +175,29 @@ body::before {
   align-items: center;
   justify-content: center;
   width: 100%;
-  padding: 14px 24px;
-  background: var(--ink);
+  padding: 12px;
+  background: var(--accent);
   color: var(--white);
   border: none;
-  border-radius: var(--radius-sm);
-  font-family: var(--font-body);
-  font-size: 14.5px;
+  border-radius: var(--r8);
+  font-family: var(--font-ui);
+  font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   transition: var(--transition);
-  letter-spacing: 0.02em;
-  margin-top: 4px;
+  margin-top: 2px;
 }
 
 .btn:hover {
-  background: var(--gold-dark);
+  background: var(--accent2);
   transform: translateY(-1px);
-  box-shadow: var(--shadow-sm);
 }
 
 .separator {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin: 20px 0;
+  gap: 10px;
+  margin: 18px 0 14px;
 }
 
 .separator::before,
@@ -195,58 +209,58 @@ body::before {
 }
 
 .separator span {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 600;
   letter-spacing: 0.1em;
-  color: var(--ink-light);
+  color: var(--text3);
 }
 
 .oauth {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin-bottom: 24px;
+  gap: 8px;
+  margin-bottom: 20px;
 }
 
 .oauth-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  padding: 11px 18px;
-  border-radius: var(--radius-md);
+  gap: 9px;
+  padding: 10px 16px;
+  border-radius: var(--r8);
   text-decoration: none;
-  font-family: var(--font-body);
-  font-size: 13.5px;
-  font-weight: 600;
-  border: 1px solid var(--border);
-  background: var(--white);
-  color: var(--ink);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 500;
+  border: 1px solid var(--border2);
+  background: var(--surface2);
+  color: var(--text);
   transition: var(--transition);
 }
 
 .oauth-btn:hover {
-  background: var(--surface);
+  background: var(--surface3);
+  border-color: var(--border2);
   transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(26,23,20,0.07);
 }
 
 .oauth-btn img {
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   flex-shrink: 0;
 }
 
 .redirect {
   text-align: center;
-  font-size: 13px;
-  color: var(--ink-light);
-  padding-top: 18px;
+  font-size: 12.5px;
+  color: var(--text3);
+  padding-top: 16px;
   border-top: 1px solid var(--border);
 }
 
 .redirect a {
-  color: var(--gold-dark);
+  color: var(--accent2);
   font-weight: 600;
   text-decoration: none;
   transition: var(--transition);
@@ -257,11 +271,22 @@ body::before {
 }
 
 @keyframes fadeUp {
-  from { opacity: 0; transform: translateY(12px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @media (max-width: 480px) {
-  .card-inner { padding: 28px 22px 24px; }
-  .card-header h1 { font-size: 24px; }
+  .card-inner {
+    padding: 28px 20px 24px;
+  }
+
+  .card-header h1 {
+    font-size: 22px;
+  }
 }

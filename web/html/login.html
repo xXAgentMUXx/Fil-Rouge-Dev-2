@@ -10,28 +10,30 @@
 
 <div class="container">
     <div class="card-inner">
+
         <div class="card-brand">
-            <a href="/" class="brand-name">Y<span>·</span>Plaza</a>
+            <a href="/" class="brand-name">Y-Plaza</a>
         </div>
+
         <div class="card-header">
             <span class="card-eyebrow">Bon retour</span>
             <h1>Connexion</h1>
         </div>
-        <form action="/post-login" method="POST" class="form">
 
+        <form action="/post-login" method="POST" class="form">
             <div class="form-group">
                 <label for="email">Adresse e-mail</label>
-                <input type="email" id="email" name="email"
-                       placeholder="exemple@mail.com" required>
+                <input type="email" id="email" name="email" placeholder="exemple@mail.com" required>
             </div>
             <div class="form-group">
                 <label for="password">Mot de passe</label>
-                <input type="password" id="password" name="password"
-                       placeholder="••••••••" required>
+                <input type="password" id="password" name="password" placeholder="••••••••" required>
             </div>
             <button type="submit" class="btn">Se connecter</button>
         </form>
+
         <div class="separator"><span>OU</span></div>
+
         <div class="oauth">
             <a href="/auth/google" class="oauth-btn google">
                 <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google">
@@ -42,10 +44,12 @@
                 Continuer avec GitHub
             </a>
         </div>
+
         <p class="redirect">
             Pas encore de compte ? <a href="/register">Créer un compte</a>
         </p>
     </div>
 </div>
+
 </body>
 </html>

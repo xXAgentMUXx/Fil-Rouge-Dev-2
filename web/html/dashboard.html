@@ -10,7 +10,9 @@
 <body>
 
 <div class="container">
+
     <a href="/properties" class="back-btn">Retour aux propriétés</a>
+
     <div class="page-header">
         <div class="page-header-left">
             <span class="page-eyebrow">Administration</span>
@@ -18,28 +20,25 @@
         </div>
         <p class="page-date">Vue d'ensemble du catalogue</p>
     </div>
+
     <section>
         <p class="section-label">Indicateurs clés</p>
         <div class="kpi-grid">
-
             <div class="kpi-card accent">
-                <span class="kpi-icon">&#8364;</span>
+                <span class="kpi-icon">€</span>
                 <p class="kpi-label">Total des ventes</p>
                 <p class="kpi-value gold">{{.TotalSales}}<span class="kpi-unit">€</span></p>
             </div>
-
             <div class="kpi-card">
-                <span class="kpi-icon">&#10003;</span>
+                <span class="kpi-icon">✓</span>
                 <p class="kpi-label">Biens vendus</p>
                 <p class="kpi-value">{{.TotalSold}}</p>
             </div>
-
             <div class="kpi-card">
-                <span class="kpi-icon">&#9632;</span>
+                <span class="kpi-icon">▪</span>
                 <p class="kpi-label">Total propriétés</p>
                 <p class="kpi-value">{{.TotalProperties}}</p>
             </div>
-
         </div>
     </section>
     <section class="chart-panel">
@@ -51,6 +50,7 @@
             <canvas id="citiesChart"></canvas>
         </div>
     </section>
+
     <div class="two-col">
         <div class="panel">
             <div class="panel-header">
@@ -109,7 +109,6 @@
     </div>
 
 </div>
-
 <script>
 const cities = [{{range .TopCities}}"{{.City}}",{{end}}];
 const totals  = [{{range .TopCities}}{{.Total}},{{end}}];
@@ -120,10 +119,10 @@ new Chart(ctx, {
     data: {
         labels: cities,
         datasets: [{
-            label: 'Nombre de propriétés',
+            label: 'Propriétés',
             data: totals,
-            backgroundColor: 'rgba(201,169,110,0.75)',
-            borderColor: '#A8824A',
+            backgroundColor: 'rgba(99,102,241,0.6)',
+            borderColor: '#818CF8',
             borderWidth: 1.5,
             borderRadius: 6,
             borderSkipped: false
@@ -135,9 +134,11 @@ new Chart(ctx, {
         plugins: {
             legend: { display: false },
             tooltip: {
-                backgroundColor: '#1A1714',
-                titleColor: '#C9A96E',
-                bodyColor: '#FAF7F4',
+                backgroundColor: '#1E2026',
+                titleColor: '#818CF8',
+                bodyColor: '#8B909E',
+                borderColor: '#2A2D35',
+                borderWidth: 1,
                 padding: 12,
                 cornerRadius: 8,
                 callbacks: {
@@ -149,24 +150,16 @@ new Chart(ctx, {
             x: {
                 grid: { display: false },
                 border: { display: false },
-                ticks: {
-                    font: { family: "'DM Sans', sans-serif", size: 12 },
-                    color: '#8C857C'
-                }
+                ticks: { font: { family: "'Inter', sans-serif", size: 12 }, color: '#555A66' }
             },
             y: {
-                grid: { color: 'rgba(26,23,20,0.06)' },
-                border: { display: false, dash: [4, 4] },
-                ticks: {
-                    font: { family: "'DM Sans', sans-serif", size: 12 },
-                    color: '#8C857C',
-                    stepSize: 1
-                }
+                grid: { color: 'rgba(42,45,53,0.8)' },
+                border: { display: false, dash: [4,4] },
+                ticks: { font: { family: "'Inter', sans-serif", size: 12 }, color: '#555A66', stepSize: 1 }
             }
         }
     }
 });
 </script>
-
 </body>
 </html>

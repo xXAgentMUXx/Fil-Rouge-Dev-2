@@ -33,7 +33,6 @@ func CallbackAuth(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	} else {
-		// No current user, normal OAuth login/register
 		var exists bool
 		err = DB.QueryRow(
 			"SELECT EXISTS(SELECT 1 FROM users WHERE email=$1)",

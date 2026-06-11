@@ -7,25 +7,22 @@
     <title>{{.Title}} — Y-Plaza</title>
 </head>
 <body>
-
 <nav class="navbar">
-    <a href="/properties" class="navbar-brand">Y<span>·</span>Plaza</a>
+    <a href="/properties" class="navbar-brand">Y-Plaza</a>
     <div class="navbar-links">
         <a href="/properties" class="back-btn">Propriétés</a>
-        <a href="/favorites" class="back-btn">&#9733; Favoris</a>
+        <a href="/favorites" class="back-btn">Favoris</a>
         <a href="/profile" class="back-btn">Mon Profil</a>
         <a href="/logout" class="back-btn btn-logout">Déconnexion</a>
     </div>
 </nav>
-
 <div class="container">
     <div class="page-back">
         <a href="/properties" class="page-back-link">Retour aux propriétés</a>
     </div>
     <div class="property-detail">
         <div class="property-image-wrap">
-            <img src="{{if .Image}}{{.Image}}{{else}}/images/default-house.jpg{{end}}"
-                 alt="{{.Title}}">
+            <img src="{{if .Image}}{{.Image}}{{else}}/images/default-house.jpg{{end}}" alt="{{.Title}}">
             {{if .IsSold}}
             <span class="sold-ribbon">Vendu</span>
             {{end}}
@@ -49,6 +46,7 @@
                 <p class="property-section-label">Description</p>
                 <p class="property-description">{{.Description}}</p>
             </div>
+
             <div class="property-section">
                 <p class="property-section-label">Mise en ligne</p>
                 <p class="property-date">{{ .CreatedAt.Format "02 janvier 2006 à 15:04" }}</p>
