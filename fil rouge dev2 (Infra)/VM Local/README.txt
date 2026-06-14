@@ -18,6 +18,56 @@ Elle comprend :
 
 ---
 
+# Importation des machines virtuelles
+
+Télécharger les archives des machines virtuelles depuis les liens OneDrive ci-dessous.
+
+Extraire les fichiers avec 7-Zip ou un logiciel équivalent.
+
+Ouvrir VMware Workstation.
+
+Cliquer sur File → Open.
+
+Sélectionner le fichier .vmx correspondant à la machine virtuelle.
+
+Au premier démarrage, lorsque VMware demande :
+
+"Did you move or copy this virtual machine?"
+
+Choisir :
+
+I Copied It
+
+afin de générer un nouvel identifiant de machine.
+
+Répéter l'opération pour les trois machines virtuelles.
+
+Démarrer les VM dans l'ordre suivant :
+
+pfSense
+
+Windows Server
+
+Windows Client
+
+# Configuration réseau VMware
+
+Les cartes réseau doivent être configurées comme suit :
+
+## pfSense
+
+Adaptateur 1 : NAT (WAN)
+
+Adaptateur 2 : Host-Only (LAN)
+
+## Windows Server
+
+Adaptateur : Host-Only
+
+## Windows Client
+
+Adaptateur : Host-Only
+
 # Machines virtuelles
 
 ## 1. Windows Server
