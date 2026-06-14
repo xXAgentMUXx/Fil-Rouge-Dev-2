@@ -109,6 +109,11 @@ Voir les utilisateurs et leurs rôles :
 
 SELECT email, role FROM users;
 
+Ajouter une agence : 
+
+INSERT INTO agencies (id, name, city)
+VALUES ('550e8400-e29b-41d4-a716-446655440000', 'Agence Lyon Sud', 'Lyon');
+
 ## Installation avec Docker
 
 Cloner le projet :

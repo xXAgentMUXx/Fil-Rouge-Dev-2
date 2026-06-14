@@ -66,6 +66,25 @@ yplaza.local
 
 ---
 
+## Connexion domaine
+
+Sur VM : CLIENT-01
+
+Compte : YPLAZA\nom d'utilisateur
+
+Mot de passe : 
+
+Yplaza@1234
+
+Admin : 
+
+Compte : YPLAZA\adminazure
+
+Mot de passe : 
+
+Password123!
+
+
 ## Architecture
 
 Cloud
@@ -91,3 +110,11 @@ Windows Client
 - Vérification des GPO
 - Test des partages
 - Test de la sauvegarde automatique
+
+## Auteurs
+
+Urban Mathys
+Axel Macé
+Vittorio Gandossi
+
+Bachelor 2 Informatique Ynov
